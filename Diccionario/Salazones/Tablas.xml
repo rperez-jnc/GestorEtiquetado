@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <DATAPACKET Version="2.0">
+<METADATA>
+<FIELDS>
+<FIELD attrname="Tabla" fieldtype="string.uni" WIDTH="200"/>
+<FIELD attrname="Descripcion" fieldtype="string.uni" WIDTH="300"/>
+<FIELD attrname="Virtual" fieldtype="boolean"/>
+<FIELD attrname="Interna" fieldtype="boolean"/>
+<FIELD attrname="Maestro" fieldtype="boolean"/>
+<FIELD attrname="Obsoleta" fieldtype="boolean"/>
+<FIELD attrname="Auxiliar" fieldtype="boolean"/>
+<FIELD attrname="Externo" fieldtype="boolean"/>
+<FIELD attrname="Orden" fieldtype="i4"/>
+<FIELD attrname="Jerarquia" fieldtype="boolean"/>
+<FIELD attrname="Tipo" fieldtype="string.uni" WIDTH="2"/>
+<FIELD attrname="Estado" fieldtype="string.uni" WIDTH="2"/>
+<FIELD attrname="Modificado" fieldtype="dateTime"/>
+<FIELD attrname="ModificadoLogico" fieldtype="dateTime"/>
+<FIELD attrname="Compartido" fieldtype="i4"/>
+</FIELDS>
+<PARAMS/>
+</METADATA>
+<ROWDATA>
+<ROW Tabla="LINEREGU" Descripcion="L&#237;neas de regularizaci&#243;n" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="G" Estado="G" Modificado="20260401T09:39:15000" ModificadoLogico="20260401T09:39:15000" Compartido="1"/>
+<ROW Tabla="CABEREGU" Descripcion="Cabeceras de regularizaci&#243;n" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="G" Estado="G" Modificado="20251220T18:20:25000" ModificadoLogico="20251220T18:20:25000" Compartido="1"/>
+<ROW Tabla="ARTICULO" Descripcion="Art&#237;culos" Virtual="FALSE" Interna="FALSE" Maestro="TRUE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="M" Estado="G" Modificado="20260319T09:00:35000" ModificadoLogico="20260319T09:02:29000" Compartido="1"/>
+<ROW Tabla="SAL_FAO" Descripcion="Zonas FAO" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="TRUE" Externo="TRUE" Jerarquia="FALSE" Tipo="A" Estado="G" Modificado="20260313T16:33:09000" ModificadoLogico="20260313T16:33:09000" Compartido="1"/>
+<ROW Tabla="LINEALBA" Descripcion="L&#237;neas de albaranes" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="G" Estado="G" Modificado="20260313T16:34:16000" ModificadoLogico="20260313T16:35:26000" Compartido="1"/>
+<ROW Tabla="LINEFACT" Descripcion="L&#237;neas de facturas" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="G" Estado="G" Modificado="20260313T16:36:55000" ModificadoLogico="20260313T16:36:55000" Compartido="1"/>
+<ROW Tabla="SAL_ARTEPESCA" Descripcion="Artes de pesca" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="TRUE" Externo="TRUE" Jerarquia="FALSE" Tipo="A" Estado="G" Modificado="20260401T09:38:47000" ModificadoLogico="20260401T09:38:53000" Compartido="1"/>
+</ROWDATA>
+</DATAPACKET>

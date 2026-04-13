@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <DATAPACKET Version="2.0">
+<METADATA>
+<FIELDS>
+<FIELD attrname="Tabla" fieldtype="string.uni" WIDTH="200"/>
+<FIELD attrname="Indice" fieldtype="string.uni" WIDTH="500"/>
+<FIELD attrname="Columnas" fieldtype="string.uni" WIDTH="400"/>
+<FIELD attrname="Clave" fieldtype="boolean"/>
+<FIELD attrname="Unico" fieldtype="boolean"/>
+<FIELD attrname="Agrupado" fieldtype="boolean"/>
+</FIELDS>
+<PARAMS DEFAULT_ORDER="1 2"/>
+</METADATA>
+<ROWDATA>
+<ROW Tabla="GE_BASCULAS" Indice="PK_GE_BASCULAS" Columnas="GE_CODIGO" Clave="TRUE" Unico="FALSE" Agrupado="TRUE"/>
+<ROW Tabla="GE_ETIQUETAS" Indice="IDX_CODIGO_ETIQUETAS" Columnas="GE_CODIGO" Clave="FALSE" Unico="TRUE" Agrupado="FALSE"/>
+<ROW Tabla="GE_ETIQUETAS" Indice="PK_GE_ETIQUETAS" Columnas="GE_ID" Clave="TRUE" Unico="FALSE" Agrupado="TRUE"/>
+<ROW Tabla="GE_LOG" Indice="PK_GE_LOG" Columnas="GE_ID" Clave="TRUE" Unico="FALSE" Agrupado="TRUE"/>
+<ROW Tabla="GE_PESADAS" Indice="PK_GE_PESADAS" Columnas="GE_ID" Clave="TRUE" Unico="FALSE" Agrupado="TRUE"/>
+</ROWDATA>
+</DATAPACKET>

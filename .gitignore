@@ -1,0 +1,8 @@
+win32/
+__history/
+__recovery/
+*.res
+*.dproj.local
+*.identcache
+*.skincfg
+*.stst

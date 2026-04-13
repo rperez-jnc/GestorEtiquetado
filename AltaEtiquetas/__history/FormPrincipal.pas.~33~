@@ -1,0 +1,180 @@
+﻿unit FormPrincipal;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, JncLib, DmDatos, Vcl.ExtCtrls, JncGridDx, FormFormatosA3erp,
+  JncFraCxGrid, System.Actions, Vcl.ActnList,cxGridDBTableView,cxGridCustomTableView, Data.db,cxGrid;
+
+type
+  TFrmPrincipal = class(TForm)
+    fraCxGridEtiquetas: TfraCxGrid;
+    Panel1: TPanel;
+    ActionList1: TActionList;
+    acFormatos: TAction;
+    procedure FormCreate(Sender: TObject);
+    procedure acFormatosExecute(Sender: TObject);
+    procedure fraCxGridEtiquetasdbtvDatosKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+
+    procedure CargarEtiquetas;
+    function IsControlInside(AControl: TWinControl; AParent: TWinControl): Boolean;
+
+  end;
+
+var
+  FrmPrincipal: TFrmPrincipal;
+  gFicheroIni: string;
+  Bd : TdmdDatos;
+
+implementation
+
+{$R *.dfm}
+
+procedure TFrmPrincipal.acFormatosExecute(Sender: TObject);
+var
+  lFrmFormatos: TFrmFormatosA3erp;
+  lFormato : string;
+begin
+
+  lFrmFormatos:= TFrmFormatosA3erp.Create(Self);
+  lFrmFormatos.inicializa(Bd);
+  lfrmFormatos.ShowModal;
+  lFormato := lFrmFormatos.Formato;
+  lFrmFormatos.Free;
+
+  Bd.sqlEtiquetasFormato.Value := lFormato;
+
+
+end;
+
+procedure TFrmPrincipal.CargarEtiquetas;
+begin
+  Bd.CargarEtiquetas;
+  FraCxGridEtiquetas.cargaDatosGrid(Bd.DSEtiquetas,'\GestorEtiquetado\Etiquetas');
+  TJncGridDx.PonerGridEditable(FraCxGridEtiquetas.dbtvDatos);
+  TJncGridDx.OcultarColumnaNombre(FraCxGridEtiquetas.dbtvDatos,'ge_Id');
+  TJncGridDx.PonerBotonEnCampo(FraCxGridEtiquetas.dbtvDatos,'ge_Etiqueta',actionlist1[0]);
+
+end;
+
+procedure TFrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+   if Assigned(FraCxGridEtiquetas.dbtvDatos.DataController.DataSource) then
+       if FraCxGridEtiquetas.dbtvDatos.DataController.DataSource.DataSet.RecordCount > 0 then
+            FraCxGridEtiquetas.guardaGrid('\GestorEtiquetado\Etiquetas');
+end;
+
+procedure TFrmPrincipal.FormCreate(Sender: TObject);
+begin
+   gFicheroIni := paramstr(1);
+   Caption :=  Format(GetAppInfo('ProductName'), [GetAppInfo('ProductVersion')]);
+   try
+
+        Bd := TdmdDatos.Create(self, gFicheroIni);
+        Bd.Conecta;
+
+        gFicheroIni := bd.FicheroIni;
+
+   except
+       on e: Exception do
+       begin
+           Showmessage(e.Message);
+           Application.Terminate;
+       end;
+
+   end;
+
+   CargarEtiquetas;
+end;
+
+procedure TFrmPrincipal.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+ var
+  V: TcxGridDBTableView;
+  Item: TcxCustomGridTableItem;  // <- en vez de TcxGridColumn
+  ColDB: TcxGridDBColumn;
+
+begin
+ if Key <> VK_F12 then Exit;
+
+  // Ojo: .Focused en un TableView no suele ser fiable. Mejor preguntar al cxGrid.
+  // Si no tienes el cxGrid a mano, al menos usa el Site o el control contenedor.
+  // Aquí tiro por tu view directamente:
+  V := FraCxGridEtiquetas.dbtvDatos;
+
+  // Si quieres asegurarte de que el foco está en ese grid:
+  if (V = nil) or (V.Site = nil) then Exit;
+
+  // ✅ En edición, el foco suele estar en el editor, no en el Site.
+  // Comprobamos si el foco (ActiveControl) está dentro del Site del view:
+  if (ActiveControl = nil) or not IsControlInside(ActiveControl, V.Site) then
+    Exit;
+
+  Item := V.Controller.FocusedItem;
+  if Item = nil then Exit;
+
+  if not (Item is TcxGridDBColumn) then Exit;
+  ColDB := TcxGridDBColumn(Item);
+
+  if not SameText(ColDB.DataBinding.FieldName, 'ge_etiqueta') then Exit;
+
+  Key := 0;
+  acFormatosExecute(Self);
+
+end;
+
+procedure TFrmPrincipal.fraCxGridEtiquetasdbtvDatosKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+var
+  V: TcxGridDBTableView;
+  Item: TcxCustomGridTableItem;  // <- en vez de TcxGridColumn
+  ColDB: TcxGridDBColumn;
+  DS: TDataSet;
+  F: TField;
+  NuevoValor: string;
+begin
+  if Key <> VK_F12 then Exit;
+
+  V := TcxGridDBTableView(Sender);
+
+  // Según versión: FocusedItem suele estar siempre
+  Item := V.Controller.FocusedItem;
+  if Item = nil then Exit;
+
+  // Solo si el item enfocado es una columna DB
+  if not (Item is TcxGridDBColumn) then Exit;
+  ColDB := TcxGridDBColumn(Item);
+
+  // Solo reaccionar en la columna deseada
+  if not SameText(ColDB.DataBinding.FieldName, 'Formato') then Exit;
+
+  Key := 0; // consumir tecla
+
+  DS := V.DataController.DataSource.DataSet;
+  if (DS = nil) or not DS.Active then Exit;
+
+  F := DS.FieldByName(ColDB.DataBinding.FieldName);
+
+  acFormatosExecute(self);
+end;
+
+function TFrmPrincipal.IsControlInside(AControl, AParent: TWinControl): Boolean;
+begin
+  Result := False;
+  while AControl <> nil do
+  begin
+    if AControl = AParent then
+      Exit(True);
+    AControl := AControl.Parent;
+  end;
+end;
+
+end.

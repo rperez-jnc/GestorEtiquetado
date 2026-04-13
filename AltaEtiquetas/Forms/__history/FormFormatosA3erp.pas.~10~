@@ -1,0 +1,122 @@
+unit FormFormatosA3erp;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, JncFraCxGrid, DmDatos, JncGridDx, JncLib,System.Generics.Collections;
+
+type
+  TFrmFormatosA3erp = class(TForm)
+    fraCxGridFormatos: TfraCxGrid;
+
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure Inicializa(vBd : TdmdDatos);
+    function CargarSeccionComoDiccionario(const RutaIni, NombreSeccion: string): TDictionary<string, string>;
+  end;
+
+var
+  FrmFormatosA3erp: TFrmFormatosA3erp;
+  Bd: TdmdDatos;
+
+implementation
+
+{$R *.dfm}
+
+
+function TFrmFormatosA3erp.CargarSeccionComoDiccionario(const RutaIni,
+  NombreSeccion: string): TDictionary<string, string>;
+var
+  SL: TStringList;
+  I: Integer;
+  Linea, SeccionActual, Clave, Valor: string;
+  P: Integer;
+begin
+  Result := TDictionary<string, string>.Create;
+  SL := TStringList.Create;
+  try
+    SL.LoadFromFile(RutaIni, TEncoding.UTF8); // cambia encoding si procede (ANSI, etc.)
+
+    SeccionActual := '';
+    for I := 0 to SL.Count - 1 do
+    begin
+      Linea := Trim(SL[I]);
+      if (Linea = '') then
+        Continue;
+
+    // Sección: [XXXXX]
+      if (Linea.Length >= 2) and (Linea[1] = '[') and (Linea[Linea.Length] = ']') then
+      begin
+        SeccionActual := Copy(Linea, 2, Linea.Length - 2);
+        Continue;
+      end;
+
+      // Solo procesamos la sección exacta, ignorando GUIDs: LSTETIART.{...}
+      if not SameText(SeccionActual, NombreSeccion) then
+        Continue;
+      // Par clave=valor
+      P := Pos('=', Linea);
+      if P <= 1 then
+        Continue;
+
+      Clave := Trim(Copy(Linea, 1, P - 1));
+      Valor := Trim(Copy(Linea, P + 1, MaxInt));
+
+      // Normalizamos para búsquedas case-insensitive
+      Result.AddOrSetValue(UpperCase(Clave), Valor);
+    end;
+  finally
+    SL.Free;
+  end;
+end;
+
+procedure TFrmFormatosA3erp.Inicializa(vBd: TdmdDatos);
+var
+  Dic: TDictionary<string, string>;
+  SR: TSearchRec;
+  Ruta, RutaIni: string;
+  NombreArchivo, Desc: string;
+begin
+  Bd := VBd;
+
+   bd.JvmFormatos.Close;
+  bd.JvmFormatos.Open;
+  //Buscamos los formatos de etiquetas existentes en A3erp
+  Ruta := directorioconbarra(Bd.CarpetaListados) + 'Listados';
+  RutaIni := directorioconbarra(Bd.CarpetaListados) + 'Sistema\Litados.ini';
+
+  Dic := CargarSeccionComoDiccionario(RutaIni, 'LSTETIART');
+  try
+    if FindFirst(IncludeTrailingPathDelimiter(Ruta) + 'LSTETIART.*', faAnyFile, SR) = 0 then
+    begin
+      try
+        repeat
+        begin
+          if (SR.Attr and faDirectory) = 0 then
+          begin
+            NombreArchivo := UpperCase(SR.Name);
+            if Dic.TryGetValue(NombreArchivo, Desc) then
+                bd.JvmFormatos.AppendRecord([SR.Name, Desc]) // Nombre del archivo encontrado
+            else
+               bd.JvmFormatos.AppendRecord([SR.Name, 'sin descripción en [LSTETIART]']) ;
+          end;
+        end;
+        until FindNext(SR) <> 0;
+      finally
+        FindClose(SR);
+      end;
+    end;
+  finally
+
+    Dic.Free;
+  end;
+
+  FraCxGridFormatos.cargaDatosGrid(Bd.DSFormatos,'\GestorEtiquetado\Formatos');
+  TJncGridDx.PonerGridNoEditable(FraCxGridFormatos.dbtvDatos);
+
+end;
+
+end.

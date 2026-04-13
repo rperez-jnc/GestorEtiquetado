@@ -1,0 +1,20 @@
+program GestorEtiquetado;
+
+uses
+  Vcl.Forms,
+  FormPrincipal in 'FormPrincipal.pas' {FrmPrincipal},
+  IniDataModule in '..\..\comun\modulos\IniDataModule.pas' {dmIniDataModule: TDataModule},
+  SQLServerDataModule in '..\..\comun\modulos\SQLServerDataModule.pas' {dmSQLServerDataModule: TDataModule},
+  DmDatos in 'Datos\DmDatos.pas' {dmdDatos: TDataModule};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TFrmPrincipal, FrmPrincipal);
+  Application.CreateForm(TdmIniDataModule, dmIniDataModule);
+  Application.CreateForm(TdmSQLServerDataModule, dmSQLServerDataModule);
+  Application.CreateForm(TdmdDatos, dmdDatos);
+  Application.Run;
+end.

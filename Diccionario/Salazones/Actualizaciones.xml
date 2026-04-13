@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <DATAPACKET Version="2.0">
+<METADATA>
+<FIELDS>
+<FIELD attrname="Modificado" fieldtype="dateTime"/>
+<FIELD attrname="Version" fieldtype="string.uni" WIDTH="10"/>
+<FIELD attrname="Revision" fieldtype="string.uni" WIDTH="10"/>
+<FIELD attrname="Parche" fieldtype="string.uni" WIDTH="10"/>
+<FIELD attrname="Orden" fieldtype="i4"/>
+<FIELD attrname="Identificador" fieldtype="i4"/>
+<FIELD attrname="Descripcion" fieldtype="string.uni" WIDTH="300"/>
+<FIELD attrname="Sentencia" fieldtype="bin.hex" SUBTYPE="WideText"/>
+</FIELDS>
+<PARAMS/>
+</METADATA>
+<ROWDATA>
+<ROW Modificado="20250915T19:52:09000" Version="1" Revision="0" Parche="" Orden="11" Identificador="7" Descripcion="Defecto" Sentencia="UPDATE LINEREGU SET SAL_COEFICIENTE=1 WHERE SAL_COEFICIENTE IS NULL&#013;&#010;"/>
+</ROWDATA>
+</DATAPACKET>

@@ -1,0 +1,45 @@
+unit DmDatos;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, DLL_dmEstandar, Data.DB, Data.Win.ADODB, JncLib;
+
+type
+  TdmdDatos = class(TdmDLL)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure CalculaYGuardaFAO(vIdReg:double);
+  end;
+
+var
+  dmdDatos: TdmdDatos;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+{ TdmdDatos }
+
+procedure TdmdDatos.CalculaYGuardaFAO(vIdReg: double);
+begin
+  with query do
+  begin
+    close;
+    sql.Clear;
+
+    Sql.Add('select Sum(Unidades) unidades, SAl_Fao from lineregu with(nolock) ');
+    sql.Add(' where idreg = ' + formateafloatsql(vIdReg));
+    sql.Add(' and unidades < 0 ');
+    sql.Add(' group by Sal_Fao');
+
+    open;
+
+  end;
+end;
+
+end.

@@ -1,0 +1,10 @@
+inherited dmdDatos: TdmdDatos
+  OldCreateOrder = True
+  Width = 342
+  object sqlPesadas: TADOQuery
+    Connection = acnConexion
+    Parameters = <>
+    Left = 176
+    Top = 16
+  end
+end

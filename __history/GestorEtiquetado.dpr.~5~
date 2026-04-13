@@ -1,0 +1,21 @@
+program GestorEtiquetado;
+
+uses
+  Vcl.Forms,
+  FormPrincipal in 'FormPrincipal.pas' {FrmPrincipal},
+  IniDataModule in '..\..\comun\modulos\IniDataModule.pas' {dmIniDataModule: TDataModule},
+  SQLServerDataModule in '..\..\comun\modulos\SQLServerDataModule.pas' {dmSQLServerDataModule: TDataModule},
+  DmDatos in 'Datos\DmDatos.pas' {dmdDatos: TDataModule},
+  DmBascula in 'Datos\DmBascula.pas' {AccesoBascula: TDataModule},
+  BasculaModelo in 'Datos\BasculaModelo.pas',
+  FormValidacionUsuario in 'Form\FormValidacionUsuario.pas' {FrmValidacion};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TFrmPrincipal, FrmPrincipal);
+  Application.CreateForm(TFrmValidacion, FrmValidacion);
+  Application.Run;
+end.

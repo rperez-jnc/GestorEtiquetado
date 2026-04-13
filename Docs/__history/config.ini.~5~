@@ -1,0 +1,39 @@
+                ;Datos para Nexus/A3Erp
+[Datos]
+;Nombre de la base de datos registrada en SQLServer
+;** Parámetro básico de configuración Nexus/A3Erp
+BaseDatos=SalazonesSaez
+
+;Nombre de la empresa registrada en Nexus/A3Erp
+;** Parámetro básico de configuración
+Empresa=SalazonesSaez
+
+;Contraseña de sa
+;** Parámetro básico de configuración con Nexus/A3Erp
+Password=w6DCocOmw6bDrsW4w6TDiA==
+
+;Instancia del servidor SQLSever
+;** Parámetro básico de configuración con Nexus/A3Erp
+Servidor=DESARROLLO-CH\A3ERP
+Server=DESARROLLO-CH
+Ip=
+
+;Base de datos de sistema de Nexus/A3Erp
+;** Parámetro básico de configuración Nexus/A3Erp
+Sistema=A3Erp$Sistema
+
+;Usuario de SQLServer
+;** Parámetro básico de configuración Nexus/A3Erp
+Usuario=sa
+
+NombreArchivoLog = E:\Repositorios\SalazonesSaez\GestorEtiquetado\Logs\log.txt
+
+[Opciones]
+;Timer espera
+Timer =500
+
+; Bascula para realizar la lectura
+Bascula =1
+
+; Peso descarte pesadas
+Descarte =0

@@ -1,0 +1,24 @@
+unit FormEtiquetas;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs;
+
+type
+  TFrmEtiquetas = class(TForm)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmEtiquetas: TFrmEtiquetas;
+
+implementation
+
+{$R *.dfm}
+
+end.

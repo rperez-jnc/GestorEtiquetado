@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <DATAPACKET Version="2.0">
+<METADATA>
+<FIELDS>
+<FIELD attrname="Tabla" fieldtype="string.uni" WIDTH="200"/>
+<FIELD attrname="Descripcion" fieldtype="string.uni" WIDTH="300"/>
+<FIELD attrname="Virtual" fieldtype="boolean"/>
+<FIELD attrname="Interna" fieldtype="boolean"/>
+<FIELD attrname="Maestro" fieldtype="boolean"/>
+<FIELD attrname="Obsoleta" fieldtype="boolean"/>
+<FIELD attrname="Auxiliar" fieldtype="boolean"/>
+<FIELD attrname="Externo" fieldtype="boolean"/>
+<FIELD attrname="Orden" fieldtype="i4"/>
+<FIELD attrname="Jerarquia" fieldtype="boolean"/>
+<FIELD attrname="Tipo" fieldtype="string.uni" WIDTH="2"/>
+<FIELD attrname="Estado" fieldtype="string.uni" WIDTH="2"/>
+<FIELD attrname="Modificado" fieldtype="dateTime"/>
+<FIELD attrname="ModificadoLogico" fieldtype="dateTime"/>
+<FIELD attrname="Compartido" fieldtype="i4"/>
+</FIELDS>
+<PARAMS DEFAULT_ORDER="1"/>
+</METADATA>
+<ROWDATA>
+<ROW Tabla="ARTICULO" Descripcion="Articulos" Virtual="FALSE" Interna="FALSE" Maestro="TRUE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="M" Estado="G" Modificado="20260114T13:11:25000" ModificadoLogico="20260114T13:11:25000" Compartido="1"/>
+<ROW Tabla="GE_BASCULAS" Descripcion="Basculas" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="TRUE" Externo="TRUE" Jerarquia="FALSE" Tipo="A" Estado="G" Modificado="20260113T08:46:13000" ModificadoLogico="20260113T08:46:13000" Compartido="1"/>
+<ROW Tabla="GE_ETIQUETAS" Descripcion="Etiquetas a usar en Gestor de Etiquetado " Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="TRUE" Externo="TRUE" Jerarquia="FALSE" Tipo="A" Estado="G" Modificado="20260407T10:29:00000" ModificadoLogico="20260407T10:29:07000" Compartido="1"/>
+<ROW Tabla="GE_LOG" Descripcion="Log de gestor de etiquetas" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="TRUE" Externo="TRUE" Jerarquia="FALSE" Tipo="A" Estado="G" Modificado="20260113T12:35:19000" ModificadoLogico="20260114T10:19:52000" Compartido="1"/>
+<ROW Tabla="GE_PESADAS" Descripcion="Pesadas" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="TRUE" Externo="TRUE" Jerarquia="FALSE" Tipo="A" Estado="G" Modificado="20260408T09:56:23000" ModificadoLogico="20260408T09:56:23000" Compartido="1"/>
+<ROW Tabla="LINEREGU" Descripcion="L&#237;neas de regularizacion" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="G" Estado="G" Modificado="20260409T08:34:00000" ModificadoLogico="20260409T08:34:09000" Compartido="1"/>
+<ROW Tabla="PERSONA" Descripcion="Personas" Virtual="FALSE" Interna="FALSE" Maestro="TRUE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="M" Estado="G" Modificado="20260113T11:48:34000" ModificadoLogico="20260113T11:48:39000" Compartido="1"/>
+</ROWDATA>
+</DATAPACKET>

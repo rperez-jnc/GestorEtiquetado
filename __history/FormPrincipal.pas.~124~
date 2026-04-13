@@ -1,0 +1,728 @@
+unit FormPrincipal;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, DmDatos, JncLib, FormValidacionUsuario, Maestro,
+  JncMaestro, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Buttons, dmImagenesGrande,
+  JncFraCxGrid, DmBascula, JvExStdCtrls, JvEdit, JvValidateEdit, BasculaModelo, FormEtiquetas,
+  System.Actions, Vcl.ActnList, JncGridDx, frxClass, frxBarcode;
+
+type
+  TFrmPrincipal = class(TForm)
+    Panel1: TPanel;
+    lblcliente: TLabel;
+    FraArticulo: TfraMaestro;
+    Panel2: TPanel;
+    Label1: TLabel;
+    edLote: TEdit;
+    Panel3: TPanel;
+    Label2: TLabel;
+    dtFechaPesada: TDateTimePicker;
+    Label3: TLabel;
+    edUsuario: TEdit;
+    edPersona: TEdit;
+    chkImpresion: TCheckBox;
+    Panel4: TPanel;
+    btnSalir: TButton;
+    btnIniciar: TButton;
+    fraCxGridPesadas: TfraCxGrid;
+    Panel5: TPanel;
+    lblEstadoBascula: TLabel;
+    edPeso: TJvValidateEdit;
+    tmPeso: TTimer;
+    edCodigoEtiqueta: TEdit;
+    Label4: TLabel;
+    btnBuscarEtiquetas: TBitBtn;
+    edEtiqueta: TEdit;
+    EdIdEtiqueta: TEdit;
+    edDescEtiqueta: TEdit;
+    ActionList1: TActionList;
+    AcBuscaEtiqueta: TAction;
+    btnImprimir: TBitBtn;
+    btnRegularizar: TBitBtn;
+    btnDeselecTodo: TBitBtn;
+    btnSelectodo: TBitBtn;
+    CbOpciones: TComboBox;
+    Button1: TButton;
+    btnGuardarPesada: TBitBtn;
+    Edit1: TEdit;
+    Label5: TLabel;
+    fraCliente: TfraMaestro;
+    frxCodBarras: TfrxBarCodeObject;
+    frxReport: TfrxReport;
+    btnDiseñarEtiqueta: TBitBtn;
+    procedure FormCreate(Sender: TObject);
+    procedure btnIniciarClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnSalirClick(Sender: TObject);
+    procedure btnBuscarEtiquetasClick(Sender: TObject);
+    procedure AcBuscaEtiquetaExecute(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure edCodigoEtiquetaExit(Sender: TObject);
+    procedure tmPesoTimer(Sender: TObject);
+    procedure FraArticuloedCodigoExit(Sender: TObject);
+    procedure FraArticuloacBusquedaExecute(Sender: TObject);
+    procedure btnImprimirClick(Sender: TObject);
+    procedure btnDeselecTodoClick(Sender: TObject);
+    procedure btnRegularizarClick(Sender: TObject);
+    procedure CbOpcionesChange(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure btnSelectodoClick(Sender: TObject);
+    procedure btnGuardarPesadaClick(Sender: TObject);
+    procedure fraClienteedCodigoExit(Sender: TObject);
+    procedure fraClienteBttmaestroClick(Sender: TObject);
+    procedure fraClienteacBusquedaExecute(Sender: TObject);
+    procedure btnDiseñarEtiquetaClick(Sender: TObject);
+    procedure Edit1KeyPress(Sender: TObject; var Key: Char);
+  private
+    FFIcheroIni: TFileName;
+    FBd: TdmdDatos;
+    FIdPesada: integer;
+    FBascula: TaccesoBascula;
+    function getPeso: Double;
+
+    { Private declarations }
+  public
+    { Public declarations }
+
+    function UsuarioValido:boolean;
+    procedure activaTimerPeso(vEstado: Boolean);
+    procedure compruebaPeso;
+    procedure GuardarPesada;
+    Procedure BuscaEtiqueta;
+    Procedure CargaLecturas(vTipo:integer; vlote:string);
+    procedure CargaSqlEtiquetas(vCodCli:string);
+
+
+    property Bd:TdmdDatos read FBd write FBd;
+    property gFicheroIni: TFileName read FFIcheroIni write FFicheroIni;
+    property Bascula: TaccesoBascula read FBascula write FBascula;
+    property Peso: Double read getPeso;
+    property IdPesada : integer read FIdPesada write FIdPesada;
+  end;
+
+var
+  FrmPrincipal: TFrmPrincipal;
+const
+  kIniPeso = 'Inicio pesadas';
+  kFinPeso = 'Fin pesadas';
+
+implementation
+
+{$R *.dfm}
+
+procedure TFrmPrincipal.AcBuscaEtiquetaExecute(Sender: TObject);
+begin
+  if edCodigoEtiqueta.Focused then
+    BuscaEtiqueta;
+end;
+
+procedure TFrmPrincipal.activaTimerPeso(vEstado: Boolean);
+begin
+   tmPeso.Enabled := vEstado;
+   // Actualizamos el caption de la bascula, para mostrar el estado en el estamos
+  lblEstadoBascula.Caption := Bascula.textoEstado;
+end;
+
+
+procedure TFrmPrincipal.btnBuscarEtiquetasClick(Sender: TObject);
+begin
+  BuscaEtiqueta;
+end;
+
+procedure TFrmPrincipal.btnDeselecTodoClick(Sender: TObject);
+begin
+  FraCxGridPesadas.BorraSeleccion;
+end;
+
+procedure TFrmPrincipal.btnDiseñarEtiquetaClick(Sender: TObject);
+begin
+   screen.Cursor := crHourGlass;
+   CargaSqlEtiquetas(bd.paramCodCli);
+   Bd.ConsultaDatosEtiquetas(paramCodCli,paramLote,paramId,'Diseño');
+   screen.Cursor := crDefault;
+   frxreport.DataSet := Bd.DsEtiqueta;
+   frxReport.DesignReport();
+end;
+
+procedure TFrmPrincipal.btnGuardarPesadaClick(Sender: TObject);
+var
+  lCodArt,lEtiqueta, lFormato:string;
+
+  lId:double;
+
+
+begin
+  if bd.ValidarDatos(FraArticulo.edCodigo.text, edLote.text, edCodigoEtiqueta.Text) then
+  begin
+    lId := bd.InsertaLectura(FraArticulo.edCodigo.Text,FraArticulo.edNombre.Text, DateToStr(Now()),edLote.Text, stringtofloat(edit1.Text), edUsuario.Text, edCodigoEtiqueta.Text);
+    if ((lId <> 0) and (chkImpresion.Checked)) then
+    begin
+        CargaLecturas(cbOpciones.ItemIndex, edlote.Text);
+        with bd.sqlLecturas do
+        begin
+             locate('ge_id',lId,[]);
+             lCodArt := fieldbyname('ge_codart').AsString;
+             lEtiqueta := fieldbyname('ge_etiqueta').AsString;
+             lFormato := Bd.BuscarFormatoEtiqueta(lEtiqueta);
+             CargaSqlEtiquetas(FraCliente.edCodigo.Text);
+             Bd.ImprimirEtiqueta(lCodArt,lFormato, FraCliente.edCodigo.Text, edLote.Text ,lId);
+             bd.MarcaLineaImp(lId);
+        end;
+    end;
+    CargaLecturas(cbOpciones.ItemIndex, edLote.Text);
+   end;
+
+end;
+
+procedure TFrmPrincipal.btnImprimirClick(Sender: TObject);
+var
+  li:integer;
+  lcodart, lEtiqueta,lFormato : string;
+  lPeso, lId: double;
+begin
+   //Imprimimos las etiquetas de todos los articulos seleccinados
+
+    with FraCxGridPesadas.dbtvDatos.Controller do
+    begin
+         // Si no hay registros marcados, salta un aviso y no hace nada.
+        if SelectedRecordCount = 0 then
+        begin
+          MessageDlg('Seleccione una o más pesadas', mtInformation, [mbOK], 0);
+          Screen.Cursor := crDefault;
+          exit;
+        end;
+        bd.JvmLineasMarcar.Close;
+        bd.JvmLineasMarcar.Open;
+
+        try
+            for lI := 0 to SelectedRecordCount - 1 do
+            begin
+               Screen.Cursor := crHourGlass;
+               lCodArt := TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_Codart');
+               lEtiqueta := TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_Etiqueta');
+               lId := TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_Id');
+               lFormato := Bd.BuscarFormatoEtiqueta(lEtiqueta);
+               CargaSqlEtiquetas(FraCliente.edCodigo.Text);
+               Bd.ImprimirEtiqueta(lCodArt,lFormato,FraCliente.edCodigo.Text, EdLote.Text, lId);
+               bd.JvmLineasMarcar.Appendrecord([lId]);
+               Screen.Cursor := crDefault;
+            end;
+        finally
+           bd.MarcarLineasImp;
+           bd.JvmLineasMarcar.Close;
+           bd.JvmLineasMarcar.Open;
+           CargaLecturas(cbOpciones.ItemIndex, edlote.Text);
+        end;
+    end;
+
+end;
+
+procedure TFrmPrincipal.btnIniciarClick(Sender: TObject);
+begin
+  if bd.ValidarDatos(FraArticulo.edCodigo.text, edLote.text, edCodigoEtiqueta.Text) then
+  begin
+     if btnIniciar.Caption = KIniPeso  then
+     begin
+        Bascula := TaccesoBascula.Create(self, tmPeso,bd.Descarte);
+
+        Bascula.TipoPeso := 'Baxtran';
+        edPeso.Text := '';
+
+         // Bascula inactiva
+        Bascula.Estado := teInactivo;
+
+        activaTimerPeso(false);
+
+        activaTimerPeso(not(Bascula.Estado = teInactivo));
+        Bascula.InicializaPesos;
+
+        btnIniciar.Caption := kFinPeso;
+        Bascula.abrePuerto;
+         if Bascula.Estado = teInactivo then
+           btnIniciar.Caption := kIniPeso;
+        activaTimerPeso( Bascula.Estado <> teInactivo);
+        //Desactivamos el resto de campos para que no se puedan modificar mientras pesamos
+        Panel1.Enabled := False;
+        edlote.ReadOnly := true;
+        btnSelecTodo.enabled := False;
+        btnDeselecTodo.enabled := False;
+        BtnSalir.Enabled := False;
+        btnImprimir.Enabled := False;
+        BtnRegularizar.Enabled := False;
+        chkImpresion.Enabled := False;
+     end
+     else
+     begin
+        btnIniciar.Caption := KIniPeso;
+        Bascula.destroy;
+        lblEstadoBascula.Caption := 'Inactivo';
+        Panel1.Enabled := True;
+        edlote.ReadOnly := False;
+
+        btnSelecTodo.enabled := True;
+        btnDeselecTodo.enabled := True;
+        BtnSalir.Enabled := True;
+        btnImprimir.Enabled := True;
+        BtnRegularizar.Enabled := True;
+        chkImpresion.Enabled := True;
+     end;
+  end;
+end;
+
+procedure TFrmPrincipal.btnRegularizarClick(Sender: TObject);
+var
+  li: integer;
+  lCodart:string;
+  lpeso, lid :double;
+  llote: string;
+  lIdReg:double;
+  lCodartAnt: string;
+  lUnidades:double;
+  lNUmLin : double;
+  lListPesos : TStringList;
+begin
+  lListPesos := TStringList.Create;
+  //Imprimimos las etiquetas de todos los articulos seleccinados
+
+    with FraCxGridPesadas.dbtvDatos.Controller do
+    begin
+         // Si no hay registros marcados, salta un aviso y no hace nada.
+        if SelectedRecordCount = 0 then
+        begin
+          MessageDlg('Seleccione una o más pesadas', mtInformation, [mbOK], 0);
+          Screen.Cursor := crDefault;
+          exit;
+        end;
+        bd.JvmLineasMarcar.Close;
+        bd.JvmLineasMarcar.Open;
+
+        bd.JvmLineasARegularizar.close;
+        bd.JvmLineasARegularizar.open;
+
+        lLote := edLote.Text;
+        if not bd.BuscarRegularizacion(lLote) then
+        begin
+          MessageDlg('No se encontró ninguna regularización para ese lote', mtError, [mbOK], 0);
+          exit;
+        end;
+        try
+          try
+              for lI := 0 to SelectedRecordCount - 1 do
+              begin
+                 Screen.Cursor := crHourGlass;
+                 lId :=  TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_id');
+                 //Metemos las lineas en un memorydata para ordernarlas por codigo de articulo
+                 bd.JvmLineasARegularizar.AppendRecord([Uppercase(TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_Codart')),
+                                                        TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_descripcion'),
+                                                        TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_fecha'),
+                                                        TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_lote'),
+                                                        lId,
+                                                        TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_peso')]);
+
+                bd.JvmLineasMarcar.AppendRecord([TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_id')]);
+              end;
+
+              //Ahora ordenamos por codart para sumar cantidades y generar linea por codart
+
+              with bd.JvmLineasARegularizar do
+              begin
+                 SortOnFields('Ge_CodArt',False,False);
+                 first;
+
+                 lCodArt := Fieldbyname('Ge_codart').AsString;
+                 lCodArtAnt := lCodArt;
+                 lPeso :=  Fieldbyname('ge_peso').AsFloat;
+                 lId :=  FieldByName('ge_id').AsFloat;
+                 bd.JvmPesosporLinea.close;
+                 bd.JvmPesosporLinea.open;
+
+                 lUnidades := 0;
+                 while not eof do
+                 begin
+                   if lCodArt <> lCodArtAnt then
+                   begin
+                      lNumLin := Bd.CrearLineaRegularizacion(lCodArtAnt,lLote,lUnidades ,lListPesos);
+                      lUnidades := lPeso;
+                      lListPesos.Free;
+                      lListPesos := TStringList.Create;
+                      lListPesos.Add(FloatToStr(lId));
+
+                      bd.JvmPesosporLinea.Filtered:= False;
+                      bd.JvmPesosporLinea.Filter := ('NumLin = 0');
+                      bd.JvmPesosporLinea.Filtered:= true;
+                      bd.JvmPesosporLinea.First;
+
+                      while not bd.JvmPesosporLinea.eof do
+                      begin
+                        bd.JvmPesosporLinea.Edit;
+                        bd.JvmPesosporLinea.FieldByName('numlin').value:= lNumLin;
+                        bd.JvmPesosporLinea.Post;
+                        bd.JvmPesosporLinea.next;
+                      end;
+                      bd.JvmPesosporLinea.Filtered:= False;
+                      bd.JvmPesosPorLinea.AppendRecord([lId,0]);
+
+                   end
+                   else
+                   begin
+                     lUnidades := lUnidades + lPeso;
+                     bd.JvmPesosPorLinea.AppendRecord([lId,0]);
+                     lListPesos.Add(FloatToStr(lId));
+                   end;
+
+
+                   next;
+                   lCodArtAnt := lCodArt;
+                   lCodArt := Fieldbyname('Ge_codart').AsString;
+                   lPeso :=  Fieldbyname('ge_peso').AsFloat;
+                   lId :=  FieldByName('ge_id').AsFloat;
+
+
+                 end;
+                 //Creamos la ultima
+
+                 lNumLin := Bd.CrearLineaRegularizacion(lCodArtAnt,lLote,lUnidades ,lListPesos);
+
+                 bd.JvmPesosporLinea.Filtered:= False;
+                 bd.JvmPesosporLinea.Filter := ('NumLin = 0');
+                 bd.JvmPesosporLinea.Filtered:= true;
+                 bd.JvmPesosporLinea.First;
+                 while not bd.JvmPesosporLinea.eof do
+                 begin
+                    bd.JvmPesosporLinea.Edit;
+                    bd.JvmPesosporLinea.FieldByName('numlin').value:= lNumLin;
+                    bd.JvmPesosporLinea.Post;
+                    bd.JvmPesosporLinea.next;
+                 end;
+                  bd.JvmPesosporLinea.Filtered:= False;
+
+              end;
+
+
+                 Screen.Cursor := crDefault;
+          finally
+            lListPesos.Free;
+            lIdReg := bd.FinalizarRegularizacion;
+            if lIdReg > 0 then
+            begin
+              MessageDlg('Se ha modificado la regularizacion ' + Bd.NumeroRegularizacion(lIdReg), mtInformation, [mbOK], 0);
+              bd.MarcarLineasRegu(lIdReg);
+              CargaLecturas(cbOpciones.ItemIndex, edLote.Text);
+            end;
+          end;
+        except
+          on e:exception do
+          begin
+             MessageDlg('Error al crear la regularizacion ' + e.message, mtError, [mbOK], 0);
+             bd.CancelaRegularizacion;
+          end;
+
+        end;
+
+    end;
+
+end;
+
+procedure TFrmPrincipal.btnSalirClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TFrmPrincipal.btnSelectodoClick(Sender: TObject);
+begin
+  FraCxGridPesadas.SeleccionaTodo;
+end;
+
+procedure TFrmPrincipal.BuscaEtiqueta;
+var
+  lfrmEtiquetas : TfrmEtiquetas;
+begin
+  lfrmEtiquetas := TfrmEtiquetas.Create(Self);
+  lfrmEtiquetas.Inicializa(Bd);
+  lfrmEtiquetas.ShowModal;
+
+  EdIdEtiqueta.text :=  inttostr(lfrmEtiquetas.IdEtiqueta);
+  EdCodigoEtiqueta.Text := lFrmEtiquetas.Codigo;
+  EdEtiqueta.Text := lFrmEtiquetas.Etiqueta;
+  edDescEtiqueta.Text := lFrmEtiquetas.Descripcion;
+  lFrmEtiquetas.Free;
+end;
+
+procedure TFrmPrincipal.Button1Click(Sender: TObject);
+begin
+  if edlote.Text <> '' then
+     CargaLecturas(cbOpciones.ItemIndex, edLote.text)
+  else
+     MessageDlg('Indique el lote ', mtInformation, [mbOK], 0);
+end;
+
+procedure TFrmPrincipal.CargaLecturas(vTipo:integer; vLote:string);
+begin
+  Bd.BuscaLecturas(vTipo, vLote);
+  FraCxGridPesadas.cargaDatosGrid(Bd.DsLecturas,'\GestorEtiquetado\Pesadas');
+  TJncGridDx.PonerGridNoEditable(FraCxGridPesadas.dbtvDatos);
+  TJncGridDx.OcultarColumnaNombre(FraCxGridPesadas.dbtvDatos,'ge_Id');
+end;
+
+procedure TFrmPrincipal.CargaSqlEtiquetas(vCodCli:string);
+var
+ lCadena : string;
+begin
+    Bd.SqlTextEtiquetas := 'Select ge_id, ge_codart, ge_descripcion, ge_lote,ge_peso,articulo.sal_ingredientes,SAL_INGREDIENTES, SAL_METOPROD, SAL_ALERGENOS,SAL_FABRICADOPOR, SAL_ENVASADOPOR,'+
+                  ' SAL_DIASCADUCA, SAL_CONSERVACION, SAL_ANGRASASTOTAL,SAL_ANGTSATURADAS, SAL_ANHIDRACAR, SAL_ANHCAZUCAR,' +
+                  ' SAL_ANPROTEINAS, SAL_ANSAL, Caberegu.param1 Fao, Caberegu.param2 Arte, DATEADD(DAY, sal_DiasCaduca, GETDATE()) AS FechaCaducidad, '+
+                  ' alterna.codalt,';
+      if vCodCli <> '' then
+          Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas +' refcli.referencia'
+      else
+          Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas +' '''' referencia';
+
+      Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' from ge_pesadas with(nolock) ' +
+                  ' left outer join articulo with (nolock) on articulo.codart = GE_CODART' +
+                  ' left outer join CABEREGU with (nolock) on caberegu.param3 = :PLote ';
+      if vCodCli <> '' then
+          Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' left outer join refcli with(nolock) on refcli.codcli = :PCodCLi and refcli.codart = ge_codart ';
+      Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' left outer join alterna with(nolock) on alterna.codart = ge_codart '+
+                  ' where ge_id = :PId';
+  lCadena :=Bd.SqlTextEtiquetas ;
+end;
+
+procedure TFrmPrincipal.CbOpcionesChange(Sender: TObject);
+begin
+   if edlote.Text <> '' then
+     CargaLecturas(cbOpciones.ItemIndex, edLote.text);
+end;
+
+procedure TFrmPrincipal.compruebaPeso;
+begin
+   lblEstadoBascula.Caption := Bascula.textoEstado;
+   edPeso.Text := FloatToStr(Bascula.Peso);
+  // Comprueba si está estable
+  if Bascula.Estado = teEstable then
+  begin
+    // Si el peso es real
+    if Peso > 0 then
+    begin
+
+      //Guarda lectura
+      GuardarPesada;
+      if chkImpresion.Checked then
+
+
+      Bascula.Estado := tePesando;
+      lblEstadoBascula.Caption := Bascula.textoEstado;
+      // edPeso.Text := '';
+    end;
+  end;
+end;
+
+
+
+procedure TFrmPrincipal.edCodigoEtiquetaExit(Sender: TObject);
+var
+  lEtiqueta, lDescripcion:string;
+
+begin
+   edCodigoEtiqueta.Text := Bd.BuscarEtiqueta(edCodigoEtiqueta.Text, lEtiqueta, lDescripcion );
+   edEtiqueta.text := lEtiqueta;
+   edDescEtiqueta.text := lDescripcion;
+
+end;
+
+procedure TFrmPrincipal.Edit1KeyPress(Sender: TObject; var Key: Char);
+begin
+   if Key = '.' then
+      Key := ',';
+end;
+
+procedure TFrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  if Assigned(FraCxGridPesadas.dbtvDatos.DataController.DataSource) then
+       if FraCxGridPesadas.dbtvDatos.DataController.DataSource.DataSet.RecordCount > 0 then
+            FraCxGridPesadas.guardaGrid('\GestorEtiquetado\Pesadas');
+  bd.FinalizaNax;
+end;
+
+procedure TFrmPrincipal.FormCreate(Sender: TObject);
+begin
+   gFicheroIni := paramstr(1);
+   Caption :=  Format(GetAppInfo('ProductName'), [GetAppInfo('ProductVersion')]);
+   try
+
+        Bd := TdmdDatos.Create(self, gFicheroIni);
+        Bd.Conecta;
+
+        gFicheroIni := bd.FicheroIni;
+
+   except
+       on e: Exception do
+       begin
+           Showmessage(e.Message);
+           Application.Terminate;
+       end;
+
+   end;
+   if Not bd.ExisteBascula then
+   begin
+
+     Application.Terminate;
+   end;
+
+    Bd.InicializaNax;
+
+   Show;
+   FraArticulo.inicializa(gFicheroIni, edArticulo);
+   FraCliente.inicializa(gFicheroIni, edCliente);
+   dtFechaPesada.Date := Now();
+
+   if not UsuarioValido then
+     Application.Terminate;
+
+   edUsuario.Text := bd.UsuarioLog;
+   edPersona.Text := bd.Persona;
+   Bd.Lote := '';
+   Bd.Peso := 0;
+   btnIniciar.Caption := kIniPeso;
+   cbOpciones.ItemIndex := 0;
+   chkImpresion.Checked := bd.ImpresionAutomatica;
+
+
+end;
+
+procedure TFrmPrincipal.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  if Key = VK_F11 then
+  begin
+    Key := 0; // consumir la tecla
+    if FraArticulo.edCodigo.Focused then
+        bd.EdicionDeArticulo(FraArticulo.edCodigo.Text);
+  end
+  else
+  if Key = VK_F12 then
+  begin
+    Key := 0; // consumir la tecla
+    if FraArticulo.edCodigo.Focused then
+        FraArticulo.acBusquedaExecute(Sender)
+    else
+    if FraCliente.edCodigo.Focused then
+        FraCliente.acBusquedaExecute(Sender)
+    else
+    if edCodigoEtiqueta.Focused then
+         AcBuscaEtiquetaExecute(Sender);
+  end
+
+end;
+
+procedure TFrmPrincipal.FormShow(Sender: TObject);
+begin
+  FraCliente.edCodigo.SetFocus;
+end;
+
+procedure TFrmPrincipal.FraArticuloacBusquedaExecute(Sender: TObject);
+begin
+  FraArticulo.acBusquedaExecute(Sender);
+
+end;
+
+procedure TFrmPrincipal.FraArticuloedCodigoExit(Sender: TObject);
+var
+  lEtiqueta, lDescEtiqueta: string;
+begin
+  FraArticulo.edCodigoExit(Sender);
+  if FraArticulo.edCodigo.Text <> '' then
+  begin
+       edCodigoEtiqueta.Text := bd.BuscarEtiquetaArticulo(FraArticulo.edCodigo.Text);
+       if edCodigoEtiqueta.Text <> '' then
+       begin
+         bd.BuscarEtiqueta(edCodigoEtiqueta.Text,lEtiqueta, lDescEtiqueta);
+         edEtiqueta.Text := letiqueta;
+         edDescEtiqueta.Text := lDescEtiqueta;
+       end
+       else
+       begin
+         edEtiqueta.Text := '';
+         edDescEtiqueta.Text := '';
+       end;
+
+  end;
+end;
+
+procedure TFrmPrincipal.fraClienteacBusquedaExecute(Sender: TObject);
+begin
+   FraCliente.acBusquedaExecute(Sender);
+end;
+
+procedure TFrmPrincipal.fraClienteBttmaestroClick(Sender: TObject);
+begin
+  fraCliente.BttmaestroClick(Sender);
+
+end;
+
+procedure TFrmPrincipal.fraClienteedCodigoExit(Sender: TObject);
+begin
+   FraCliente.edCodigoExit(Sender);
+end;
+
+function TFrmPrincipal.getPeso: Double;
+begin
+  result := StrToFloat(edPeso.Value);
+end;
+
+procedure TFrmPrincipal.GuardarPesada;
+var
+  lCodArt,lEtiqueta, lFormato:string;
+
+  lId:double;
+
+
+begin
+
+    lId := bd.InsertaLectura(FraArticulo.edCodigo.Text,FraArticulo.edNombre.Text, DateToStr(Now()),edLote.Text,  bascula.Peso, edUsuario.Text, edCodigoEtiqueta.Text);
+    if ((lId <> 0) and (chkImpresion.Checked)) then
+    begin
+        CargaLecturas(cbOpciones.ItemIndex, edlote.Text);
+        with bd.sqlLecturas do
+        begin
+             locate('ge_id',lId,[]);
+             lCodArt := fieldbyname('ge_codart').AsString;
+             lEtiqueta := fieldbyname('ge_etiqueta').AsString;
+             lFormato := Bd.BuscarFormatoEtiqueta(lEtiqueta);
+             CargaSqlEtiquetas(FraCliente.edCodigo.Text);
+             Bd.ImprimirEtiqueta(lCodArt,lFormato, FraCliente.edCodigo.Text, edlote.Text ,lId);
+             bd.MarcaLineaImp(lId);
+        end;
+    end;
+    CargaLecturas(cbOpciones.ItemIndex, edLote.Text);
+
+end;
+
+procedure TFrmPrincipal.tmPesoTimer(Sender: TObject);
+begin
+  // Envia datos a la bascula
+  Bascula.enviaDatos();
+    // Comprueba la lecutra e imprime si es necesario
+  CompruebaPeso;
+end;
+
+function TFrmPrincipal.UsuarioValido: boolean;
+var
+  lFrmValidacion : TFrmValidacion;
+begin
+   lFrmValidacion :=  TFrmValidacion.create(Self);
+
+   lFrmValidacion.Inicializa(Bd);
+   lFrmValidacion.ShowModal;
+
+   result := lFrmvalidacion.Valido;
+
+   lFrmValidacion.Free;
+
+end;
+
+end.

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <DATAPACKET Version="2.0">
+<METADATA>
+<FIELDS>
+<FIELD attrname="TablaPadre" fieldtype="string.uni" WIDTH="200"/>
+<FIELD attrname="TablaHija" fieldtype="string.uni" WIDTH="200"/>
+<FIELD attrname="CamposPadre" fieldtype="string.uni" WIDTH="500"/>
+<FIELD attrname="CamposHija" fieldtype="string.uni" WIDTH="500"/>
+<FIELD attrname="TipoRelacion" fieldtype="string.uni" WIDTH="2"/>
+<FIELD attrname="TipoRelacionU" fieldtype="string.uni" WIDTH="2"/>
+<FIELD attrname="FiltroPadre" fieldtype="string.uni" WIDTH="500"/>
+<FIELD attrname="FiltroHija" fieldtype="string.uni" WIDTH="500"/>
+</FIELDS>
+<PARAMS/>
+</METADATA>
+<ROWDATA>
+<ROW TablaPadre="SAL_FAO" TablaHija="LINEREGU" CamposPadre="FAO" CamposHija="SAL_FAO" TipoRelacion="R" TipoRelacionU="C"/>
+<ROW TablaPadre="SAL_FAO" TablaHija="LINEFACT" CamposPadre="FAO" CamposHija="SAL_FAO" TipoRelacion="R" TipoRelacionU="C"/>
+<ROW TablaPadre="SAL_FAO" TablaHija="LINEALBA" CamposPadre="FAO" CamposHija="SAL_FAO" TipoRelacion="R" TipoRelacionU="C"/>
+<ROW TablaPadre="SAL_ARTEPESCA" TablaHija="LINEREGU" CamposPadre="SAL_ARTEPESCA" CamposHija="SAL_ARTEPESCA" TipoRelacion="R" TipoRelacionU="C"/>
+</ROWDATA>
+</DATAPACKET>

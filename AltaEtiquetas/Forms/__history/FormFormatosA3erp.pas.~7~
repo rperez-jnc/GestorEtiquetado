@@ -1,0 +1,59 @@
+unit FormFormatosA3erp;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, JncFraCxGrid, DmDatos, JncGridDx, JncLib;
+
+type
+  TFrmFormatosA3erp = class(TForm)
+    fraCxGridFormatos: TfraCxGrid;
+
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure Inicializa(vBd : TdmdDatos);
+  end;
+
+var
+  FrmFormatosA3erp: TFrmFormatosA3erp;
+  Bd: TdmdDatos;
+
+implementation
+
+{$R *.dfm}
+
+
+procedure TFrmFormatosA3erp.Inicializa(vBd: TdmdDatos);
+var
+  SR: TSearchRec;
+  Ruta: string;
+begin
+  Bd := VBd;
+
+   bd.JvmFormatos.Close;
+  bd.JvmFormatos.Open;
+  //Buscamos los formatos de etiquetas existentes en A3erp
+  Ruta := directorioconbarra(Bd.CarpetaListados);
+
+  if FindFirst(Ruta + 'LSTETIART.*', faAnyFile, SR) = 0 then
+  begin
+    try
+      repeat
+      begin
+        if (SR.Attr and faDirectory) = 0 then
+          bd.JvmFormatos.AppendRecord([SR.Name]); // Nombre del archivo encontrado
+      end;
+      until FindNext(SR) <> 0;
+    finally
+      FindClose(SR);
+    end;
+  end;
+  FraCxGridFormatos.cargaDatosGrid(Bd.DSFormatos,'\GestorEtiquetado\Formatos');
+  TJncGridDx.PonerGridNoEditable(FraCxGridFormatos.dbtvDatos);
+
+end;
+
+end.

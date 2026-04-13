@@ -1,0 +1,141 @@
+unit DmDatos;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, DLL_dmEstandar, Data.DB, Data.Win.ADODB, JncLib;
+
+type
+  TdmdDatos = class(TdmDLL)
+    sqlPesadas: TADOQuery;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure CalculaYGuardaFAO(vIdReg:double; Var vFao, vArte:string);
+    procedure AsignarFAO(vIdReg:double;  vFao, vArte:string);
+    function BuscarLineaEnPesadas(vIdReg:double; vNumLin:integer):boolean;
+    procedure RecuperarPesadas;
+  end;
+
+var
+  dmdDatos: TdmdDatos;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+{ TdmdDatos }
+
+procedure TdmdDatos.AsignarFAO(vIdReg: double;  vFao, vArte:string);
+begin
+  with query do
+  begin
+    close;
+    sql.Clear;
+
+    sql.Add('Update lineregu set Sal_Fao = ' + quotedstr(vFao));
+    sql.Add(', sal_ArtePesca = ' + quotedstr(vArte));
+    sql.Add(' where idreg = ' + formateafloatsql(vIdReg));
+    sql.Add(' and Unidades > 0');
+
+    execsql;
+  end;
+end;
+
+function TdmdDatos.BuscarLineaEnPesadas(vIdReg: double;
+  vNumLin: integer): boolean;
+begin
+  with sqlPesadas do
+  begin
+    close;
+    sql.Clear;
+
+    sql.Add('Select ge_id from ge_pesadas with(nolock)');
+    sql.Add('where ge_idregu = ' + formateafloatsql(vIdReg));
+    sql.Add('and ge_numlinreg = ' + inttostr(vNumLin));
+
+    open;
+
+    result := recordcount > 0;
+  end;
+end;
+
+procedure TdmdDatos.CalculaYGuardaFAO(vIdReg: double; Var vFao, vArte:string);
+
+begin
+  with query do
+  begin
+    close;
+    sql.Clear;
+
+    Sql.Add('select top 1 Sum(Unidades) unidades, SAl_Fao from lineregu with(nolock) ');
+    sql.Add(' where idreg = ' + formateafloatsql(vIdReg));
+    sql.Add(' and unidades < 0 ');
+    sql.Add(' group by Sal_Fao');
+    sql.Add(' order by unidades');
+
+    open;
+
+    vFao := fieldbyname('Sal_fao').AsString;
+
+  end;
+  with query do
+  begin
+    close;
+    sql.Clear;
+
+    Sql.Add('select top 1 Sum(Unidades) unidades, SAL_ARTEPESCA from lineregu with(nolock) ');
+    sql.Add(' where idreg = ' + formateafloatsql(vIdReg));
+    sql.Add(' and unidades < 0 ');
+    sql.Add(' group by SAL_ARTEPESCA');
+    sql.Add(' order by unidades');
+
+    open;
+
+    vArte := fieldbyname('SAL_ARTEPESCA').AsString;
+
+  end;
+  with query do
+  begin
+    close;
+    sql.Clear;
+
+    sql.Add('Update caberegu set Param1 = ' + quotedstr(vFao));
+    sql.Add(', Param2 = ' + quotedstr(vArte));
+    sql.Add(' where idreg = ' + formateafloatsql(vIdReg));
+
+    execsql;
+
+  end;
+
+end;
+
+procedure TdmdDatos.RecuperarPesadas;
+var
+  lId: double;
+begin
+  with sqlPesadas do
+  begin
+    first;
+    while not eof do
+    begin
+      lId := fieldbyname('ge_id').AsFloat;
+
+      with query do
+      begin
+        close;
+        sql.Clear;
+
+        sql.Add('Update ge_pesadas set ge_regu = null where ge_id = ' + formateafloatsql(lId));
+
+        execsql;
+      end;
+      next;
+    end;
+  end;
+end;
+
+end.

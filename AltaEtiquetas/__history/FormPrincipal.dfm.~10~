@@ -1,0 +1,74 @@
+object FrmPrincipal: TFrmPrincipal
+  Left = 0
+  Top = 0
+  Caption = 'FrmPrincipal'
+  ClientHeight = 418
+  ClientWidth = 713
+  Color = clGradientActiveCaption
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  inline fraCxGridEtiquetas: TfraCxGrid
+    Left = 0
+    Top = 0
+    Width = 713
+    Height = 364
+    Align = alClient
+    AutoScroll = True
+    TabOrder = 0
+    ExplicitLeft = 135
+    ExplicitTop = 120
+    inherited Panel1: TPanel
+      Width = 713
+    end
+    inherited grdDatos: TcxGrid
+      Width = 713
+      Height = 340
+      inherited dbtvDatos: TcxGridDBTableView
+        OnKeyDown = fraCxGridEtiquetasdbtvDatosKeyDown
+        Navigator.Buttons.First.Visible = False
+        Navigator.Buttons.PriorPage.Visible = False
+        Navigator.Buttons.Prior.Visible = False
+        Navigator.Buttons.Next.Visible = False
+        Navigator.Buttons.NextPage.Visible = False
+        Navigator.Buttons.Last.Visible = False
+        Navigator.Buttons.Refresh.Visible = False
+        Navigator.Buttons.SaveBookmark.Visible = False
+        Navigator.Buttons.GotoBookmark.Visible = False
+        Navigator.Buttons.Filter.Visible = False
+        Navigator.Visible = True
+      end
+    end
+    inherited srEstilos: TcxStyleRepository
+      PixelsPerInch = 96
+    end
+    inherited erEditores: TcxEditRepository
+      PixelsPerInch = 96
+    end
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 364
+    Width = 713
+    Height = 54
+    Align = alBottom
+    TabOrder = 1
+  end
+  object ActionList1: TActionList
+    Left = 456
+    Top = 208
+    object acFormatos: TAction
+      Caption = 'Formatos'
+      ShortCut = 123
+      OnExecute = acFormatosExecute
+    end
+  end
+end

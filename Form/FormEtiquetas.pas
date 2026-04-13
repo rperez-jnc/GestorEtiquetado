@@ -1,0 +1,86 @@
+unit FormEtiquetas;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Buttons, Vcl.StdCtrls, Vcl.ExtCtrls,DmDatos,JncGridDx,
+  JncFraCxGrid;
+
+type
+  TFrmEtiquetas = class(TForm)
+    Panel1: TPanel;
+    btnSalir: TButton;
+    BtnAceptar: TBitBtn;
+    fraCxGridEtiquetas: TfraCxGrid;
+    procedure btnSalirClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure fraCxGridEtiquetasdbtvDatosDblClick(Sender: TObject);
+    procedure BtnAceptarClick(Sender: TObject);
+  private
+    FIdEtiqueta: integer;
+    FCodigo: string;
+    FEtiqueta: string;
+    FDescripcion: string;
+
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure Inicializa(vBd:TdmdDatos);
+
+    property IdEtiqueta: integer read FIdEtiqueta write FIdEtiqueta;
+    property Codigo:string read FCodigo write FCodigo;
+    property Etiqueta:string read FEtiqueta write FEtiqueta;
+    property Descripcion:string read FDescripcion write FDescripcion;
+  end;
+
+var
+  FrmEtiquetas: TFrmEtiquetas;
+  Bd:TdmdDatos;
+
+implementation
+
+{$R *.dfm}
+
+procedure TFrmEtiquetas.BtnAceptarClick(Sender: TObject);
+begin
+  IdEtiqueta := TJncGridDx.BuscaValor(FraCxGridEtiquetas.dbtvDatos,FraCxGridEtiquetas.dbtvDatos.Controller.SelectedRecords[0].RecordIndex,'ge_Id');
+  Codigo := TJncGridDx.BuscaValor(FraCxGridEtiquetas.dbtvDatos,FraCxGridEtiquetas.dbtvDatos.Controller.SelectedRecords[0].RecordIndex,'ge_Codigo');
+  Etiqueta := TJncGridDx.BuscaValor(FraCxGridEtiquetas.dbtvDatos,FraCxGridEtiquetas.dbtvDatos.Controller.SelectedRecords[0].RecordIndex,'ge_etiqueta');
+  Descripcion := TJncGridDx.BuscaValor(FraCxGridEtiquetas.dbtvDatos,FraCxGridEtiquetas.dbtvDatos.Controller.SelectedRecords[0].RecordIndex,'ge_descripcion');
+  Close;
+end;
+
+procedure TFrmEtiquetas.btnSalirClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TFrmEtiquetas.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  if Assigned(FraCxGridEtiquetas.dbtvDatos.DataController.DataSource) then
+       if FraCxGridEtiquetas.dbtvDatos.DataController.DataSource.DataSet.RecordCount > 0 then
+            FraCxGridEtiquetas.guardaGrid('\GestorEtiquetado\ConsultaEtiquetas');
+end;
+
+procedure TFrmEtiquetas.fraCxGridEtiquetasdbtvDatosDblClick(Sender: TObject);
+begin
+   IdEtiqueta := TJncGridDx.BuscaValor(FraCxGridEtiquetas.dbtvDatos,FraCxGridEtiquetas.dbtvDatos.Controller.SelectedRecords[0].RecordIndex,'ge_Id');
+   Codigo := TJncGridDx.BuscaValor(FraCxGridEtiquetas.dbtvDatos,FraCxGridEtiquetas.dbtvDatos.Controller.SelectedRecords[0].RecordIndex,'ge_Codigo');
+   Etiqueta := TJncGridDx.BuscaValor(FraCxGridEtiquetas.dbtvDatos,FraCxGridEtiquetas.dbtvDatos.Controller.SelectedRecords[0].RecordIndex,'ge_etiqueta');
+   Descripcion := TJncGridDx.BuscaValor(FraCxGridEtiquetas.dbtvDatos,FraCxGridEtiquetas.dbtvDatos.Controller.SelectedRecords[0].RecordIndex,'ge_descripcion');
+   Close;
+end;
+
+procedure TFrmEtiquetas.Inicializa(vBd: TdmdDatos);
+begin
+  Bd:= vBd;
+
+  Bd.CargarEtiquetas;
+  FraCxGridEtiquetas.cargaDatosGrid(Bd.DSEtiquetas,'\GestorEtiquetado\ConsultaEtiquetas');
+  TJncGridDx.PonerGridNoEditable(FraCxGridEtiquetas.dbtvDatos);
+  TJncGridDx.OcultarColumnaNombre(FraCxGridEtiquetas.dbtvDatos,'ge_Id');
+
+end;
+
+end.

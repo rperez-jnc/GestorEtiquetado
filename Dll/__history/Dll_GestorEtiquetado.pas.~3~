@@ -1,0 +1,31 @@
+unit Dll_GestorEtiquetado;
+
+interface
+
+procedure INICIAR(Empresa: PAnsiChar); stdcall;
+procedure FINALIZAR; stdcall;
+procedure DESPUESDEGUARDARDOCUMENTOV2(Documento: AnsiString; IdDoc: Double; Estado: integer); stdcall;
+function REPINTAR(Tabla: AnsiString): boolean; stdcall;
+
+implementation
+
+function REPINTAR(Tabla: AnsiString): boolean; stdcall;
+BEGIN
+  if Tabla = 'Caberegu' then
+    result := True;
+
+END;
+procedure INICIAR(Empresa: PAnsiChar); stdcall;
+
+begin
+  Bd := TdmdDatos.Create(nil);
+  Bd.Conecta(Empresa);
+end;
+
+  procedure FINALIZAR; stdcall;
+begin
+
+   Bd.Free;
+
+end;
+end.
