@@ -67,6 +67,7 @@ type
     FParamCodCli: string;
     FParamId: integer;
     FParamLote: string;
+    FEtiqueta: string;
     { Private declarations }
   public
     { Public declarations }
@@ -88,6 +89,7 @@ type
     function InsertaLectura(vCodArt, vDescArt,vFecha, vLote: string; vPeso : double; vUsuario, vEtiqueta:string):double;
     procedure BuscaLecturas(vTipo:integer; vLote:string);
     function BuscarEtiquetaArticulo(vCodArt:string):string ;
+    function BuscarEtiquetaCliente(vCodCli, vCodArt:string;Var vEtiqueta:string):boolean;
     procedure ImprimirEtiqueta(vCodArt,vEtiqueta, vCodCLi, vLote:string; vId:double);
     function BuscarFormatoEtiqueta(vCodigo:string):string;
     procedure CrearLineaRegularizacion(vCodArt,vLote:string;vPeso: double; vListPesos:TStringList);
@@ -102,6 +104,7 @@ type
     function BuscaLineadePeso(vIdReg, vId: double):integer;
     procedure ConsultaDatosEtiquetas(vCodCli,vLote: string; Vid:integer;vTipo:string);
     procedure EliminarPesada(lId:double);
+    procedure BuscarTipoArticulo(vCodTipo:string; Var vTipo:string) ;
 
 
     property Empresa:string read FEmpresa write FEmpresa;
@@ -124,6 +127,7 @@ type
     property ParamCodCli: string read FParamCodCli write FParamCodCli;
     property ParamLote: string read FParamLote write FParamLote;
     property ParamId:integer read FParamId write FParamId;
+    property Etiqueta: string read FEtiqueta write FEtiqueta;
   end;
 
 var
@@ -235,9 +239,14 @@ begin
     sql.Add('where ge_codigo = ' + quotedstr(cuadrasiesnumerico(vCodigo,8)));
     open;
 
-    vEtiqueta := fieldbyname('Etiqueta').AsString;
-    vDescEtiqueta := fieldByName('Descripcion').AsString;
-    result := fieldByName('ge_codigo').AsString;
+    if recordcount > 0 then
+    begin
+      vEtiqueta := fieldbyname('Etiqueta').AsString;
+      vDescEtiqueta := fieldByName('Descripcion').AsString;
+      result := fieldByName('ge_codigo').AsString;
+    end
+    else
+      result := '';
   end;
 end;
 
@@ -254,6 +263,31 @@ begin
 
     result := Fieldbyname('etiqueta').AsString;
   end;
+end;
+
+function TdmdDatos.BuscarEtiquetaCliente(vCodCli, vCodArt: string;
+  var vEtiqueta: string): boolean;
+var
+  lEtiqueta :string;
+begin
+   result := False;
+   with sqlConsulta do
+   begin
+     close;
+     sql.Clear;
+
+     sql.Add('Select coalesce(ge_etiqueta,'''') Etiqueta from ge_etiquetascliente with(nolock)');
+     sql.Add('where coalesce(ge_articulo,'''') = ' + quotedstr(vCodArt));
+     sql.Add('and coalesce(ge_cliente,'''') = ' + quotedstr(vCodCli));
+
+     open;
+
+     if recordcount > 0 then
+     begin
+       vEtiqueta := fieldbyname('Etiqueta').AsString;
+       result := true;
+     end;
+   end;
 end;
 
 function TdmdDatos.BuscarFormatoEtiqueta(vCodigo: string): string;
@@ -385,6 +419,27 @@ begin
   Naxregularizacion := coRegularizacion.Create;
   NaxRegularizacion.Iniciar;
   NaxRegularizacion.Modifica(lIdReg);
+end;
+
+procedure TdmdDatos.BuscarTipoArticulo(vCodTipo: string; var vTipo: string);
+begin
+  with sqlConsulta do
+  begin
+    close;
+    sql.clear;
+
+    sql.Add('Select coalesce(sal_descripcion,'''') descripcion from sal_tipoarticulos with(nolock)');
+    sql.Add('where sal_codtipo = ' + quotedstr(vCodTipo));
+
+    open;
+
+    if recordcount > 0 then
+      vTipo := fieldbyname('Descripcion').AsString
+   else
+      vTipo := '';
+
+
+  end;
 end;
 
 procedure TdmdDatos.CrearLineaRegularizacion(vCodArt, vLote: string; vPeso: double; vListPesos:TStringList);
@@ -594,7 +649,7 @@ begin
   ParamLote := vIni.ReadString('Opciones','ParamLote','');
   ParamId := Stringtoint(vIni.ReadString('Opciones','ParamId','0') );
   ImpresoraEtiArt := vIni.ReadString('Opciones','ImpresoraEtiArt','');
-
+  Etiqueta := vIni.ReadString('Opciones','Etiqueta','');
 
 end;
 

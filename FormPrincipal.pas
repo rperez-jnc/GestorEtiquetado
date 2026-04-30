@@ -7,12 +7,12 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, DmDatos, JncLib, FormValidacionUsuario, Maestro,
   JncMaestro, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Buttons, dmImagenesGrande,
   JncFraCxGrid, DmBascula, JvExStdCtrls, JvEdit, JvValidateEdit, BasculaModelo, FormEtiquetas,
-  System.Actions, Vcl.ActnList, JncGridDx, frxClass, frxBarcode, Vcl.Menus;
+  System.Actions, Vcl.ActnList, JncGridDx, frxClass, frxBarcode, Vcl.Menus,
+  Vcl.Touch.Keyboard, IniFiles;
 
 type
   TFrmPrincipal = class(TForm)
     Panel1: TPanel;
-    lblcliente: TLabel;
     FraArticulo: TfraMaestro;
     Panel2: TPanel;
     Label1: TLabel;
@@ -20,7 +20,6 @@ type
     Panel3: TPanel;
     Label2: TLabel;
     dtFechaPesada: TDateTimePicker;
-    Label3: TLabel;
     edUsuario: TEdit;
     edPersona: TEdit;
     chkImpresion: TCheckBox;
@@ -33,7 +32,6 @@ type
     edPeso: TJvValidateEdit;
     tmPeso: TTimer;
     edCodigoEtiqueta: TEdit;
-    Label4: TLabel;
     btnBuscarEtiquetas: TBitBtn;
     edEtiqueta: TEdit;
     EdIdEtiqueta: TEdit;
@@ -48,13 +46,21 @@ type
     Button1: TButton;
     btnGuardarPesada: TBitBtn;
     Edit1: TEdit;
-    Label5: TLabel;
     fraCliente: TfraMaestro;
     frxCodBarras: TfrxBarCodeObject;
     frxReport: TfrxReport;
     btnDiseñarEtiqueta: TBitBtn;
     PopupMenu1: TPopupMenu;
     pmeliminarpesada: TMenuItem;
+    BtnCliente: TBitBtn;
+    btnArticulo: TBitBtn;
+    btnEtiqueta: TBitBtn;
+    edImpresion: TEdit;
+    BtnUsuario: TBitBtn;
+    Panel6: TPanel;
+    TecladoFlotanteP: TTouchKeyboard;
+    btnTeclado: TBitBtn;
+    btnConfiguracion: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure btnIniciarClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -80,17 +86,30 @@ type
     procedure btnDiseñarEtiquetaClick(Sender: TObject);
     procedure Edit1KeyPress(Sender: TObject; var Key: Char);
     procedure pmeliminarpesadaClick(Sender: TObject);
+    procedure FraArticuloBttmaestroClick(Sender: TObject);
+    procedure edLoteExit(Sender: TObject);
+    procedure edImpresionClick(Sender: TObject);
+    procedure edImpresionKeyPress(Sender: TObject; var Key: Char);
+    procedure BtnUsuarioClick(Sender: TObject);
+    procedure fraClienteedCodigoClick(Sender: TObject);
+    procedure FraArticuloedCodigoClick(Sender: TObject);
+    procedure edCodigoEtiquetaClick(Sender: TObject);
+    procedure edLoteClick(Sender: TObject);
+    procedure btnTecladoClick(Sender: TObject);
+    procedure btnConfiguracionClick(Sender: TObject);
   private
     FFIcheroIni: TFileName;
     FBd: TdmdDatos;
     FIdPesada: integer;
     FBascula: TaccesoBascula;
+    FFormularioCargado: Boolean;
     function getPeso: Double;
 
     { Private declarations }
   public
     { Public declarations }
-
+    procedure CargaConfiguracion;
+    procedure GuardaConfiguracion;
     function UsuarioValido:boolean;
     procedure activaTimerPeso(vEstado: Boolean);
     procedure compruebaPeso;
@@ -109,6 +128,7 @@ type
 
 var
   FrmPrincipal: TFrmPrincipal;
+  SavedWindowState: integer;
 const
   kIniPeso = 'Inicio pesadas';
   kFinPeso = 'Fin pesadas';
@@ -134,6 +154,14 @@ end;
 procedure TFrmPrincipal.btnBuscarEtiquetasClick(Sender: TObject);
 begin
   BuscaEtiqueta;
+end;
+
+procedure TFrmPrincipal.btnConfiguracionClick(Sender: TObject);
+begin
+  GuardaConfiguracion;
+  if Assigned(FraCxGridPesadas.dbtvDatos.DataController.DataSource) then
+       if FraCxGridPesadas.dbtvDatos.DataController.DataSource.DataSet.RecordCount > 0 then
+            FraCxGridPesadas.guardaGrid('\GestorEtiquetado\Pesadas');
 end;
 
 procedure TFrmPrincipal.btnDeselecTodoClick(Sender: TObject);
@@ -414,6 +442,23 @@ begin
   FraCxGridPesadas.SeleccionaTodo;
 end;
 
+procedure TFrmPrincipal.btnTecladoClick(Sender: TObject);
+begin
+   if Panel6.Visible then
+      Panel6.Visible := False
+   else
+      Panel6.Visible := true;
+end;
+
+procedure TFrmPrincipal.BtnUsuarioClick(Sender: TObject);
+begin
+   if not UsuarioValido then
+     Application.Terminate;
+
+   edUsuario.Text := bd.UsuarioLog;
+   edPersona.Text := bd.Persona;
+end;
+
 procedure TFrmPrincipal.BuscaEtiqueta;
 var
   lfrmEtiquetas : TfrmEtiquetas;
@@ -437,6 +482,65 @@ begin
      MessageDlg('Indique el lote ', mtInformation, [mbOK], 0);
 end;
 
+procedure TFrmPrincipal.CargaConfiguracion;
+var
+  ldirectorio,lresto: string;
+  Ini: TIniFile;
+  IniFileName: string;
+  LeftPos, TopPos, Ancho, Alto: Integer;
+  WindowStateVal: Integer;
+  lPos, lPosAnt : integer;
+
+begin
+   //Extraemos el nombre del directorio donde obtener la configuración del grid
+        lpos := 1;
+
+        lDirectorio := DirectorioSistema(sdAppData)+  '\GestionServidumbre\Principal';
+        lResto := lDirectorio;
+        lposAnt := 0;
+        while lpos > 0  do
+        begin
+            lposant := lposant + lpos;
+            lPos := pos('\',lResto);
+            if lpos > 0 then
+               lresto := copy(lresto,lpos+1,length(lresto));
+
+        end;
+
+        lDirectorio := copy(lDirectorio,0,lposant - 1);
+
+  IniFileName := DirectorioSistema(sdAppData)+   '\GestorEtiquetado\Principal' + 'Form.ini';
+  if not FileExists(IniFileName) then
+    Exit;
+  Ini := TIniFile.Create(IniFileName);
+  try
+    with Ini do
+    begin
+      LeftPos := ReadInteger('FormularioPrincipal', 'Left', Self.Left);
+      TopPos := ReadInteger('FormularioPrincipal', 'Top', Self.Top);
+      Ancho := ReadInteger('FormularioPrincipal', 'Width', Self.Width);
+      Alto := ReadInteger('FormularioPrincipal', 'Height', Self.Height);
+      SavedWindowState := ReadInteger('FormularioPrincipal', 'WindowState', Integer(wsNormal));
+
+    end;
+
+    // Aplicar los valores al formulario
+    Self.Left := LeftPos;
+    Self.Top := TopPos;
+    Self.Width := Ancho;
+    Self.Height := Alto;
+
+    if SavedWindowState = 2 then //Maximizado
+       self.Position := poDefault;
+
+    Self.WindowState := TWindowState(SavedWindowState);
+  finally
+    Ini.Free;
+  end;
+
+
+end;
+
 procedure TFrmPrincipal.CargaLecturas(vTipo:integer; vLote:string);
 begin
   Bd.BuscaLecturas(vTipo, vLote);
@@ -449,14 +553,24 @@ procedure TFrmPrincipal.CargaSqlEtiquetas(vCodCli:string);
 var
  lCadena : string;
 begin
-    Bd.SqlTextEtiquetas := 'Select ge_id, ge_codart, ge_descripcion, ge_lote,ge_peso,articulo.sal_ingredientes,SAL_INGREDIENTES, SAL_METOPROD, SAL_ALERGENOS,SAL_FABRICADOPOR, SAL_ENVASADOPOR,'+
-                  ' SAL_DIASCADUCA, SAL_CONSERVACION, SAL_ANGRASASTOTAL,SAL_ANGTSATURADAS, SAL_ANHIDRACAR, SAL_ANHCAZUCAR,' +
-                  ' SAL_ANPROTEINAS, SAL_ANSAL, Caberegu.param1 Fao, Caberegu.param2 Arte, DATEADD(DAY, sal_DiasCaduca, GETDATE()) AS FechaCaducidad, '+
+    Bd.SqlTextEtiquetas := 'Select ge_id, ge_codart, ge_descripcion, ge_lote,ge_peso,articulo.sal_ingredientes,articulo.SAL_METOPROD, articulo.SAL_ALERGENOS,articulo.SAL_FABRICADOPOR, articulo.SAL_ENVASADOPOR,'+
+                  ' articulo.SAL_DIASCADUCA, articulo.SAL_CONSERVACION, articulo.SAL_ANGRASASTOTAL,articulo.SAL_ANGTSATURADAS, articulo.SAL_ANHIDRACAR, articulo.SAL_ANHCAZUCAR,' +
+                  ' articulo.SAL_ANPROTEINAS, articulo.SAL_ANSAL, Caberegu.param1 Fao, Caberegu.param2 Arte, DATEADD(DAY, articulo.sal_DiasCaduca, GETDATE()) AS FechaCaducidad, '+
                   ' alterna.codalt,';
       if vCodCli <> '' then
-          Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas +' refcli.referencia'
+      begin
+          Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' refcli.referencia referencia,refcli.descartrefcli, coalesce(refcli.sal_ingredientes,'''') ingredientesrefcli,';
+          Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' coalesce(refcli.SAL_METOPROD,'''') metoprodrefcli, coalesce(refcli.SAL_ALERGENOS,'''') alergenosrefcli,coalesce(refcli.SAL_FABRICADOPOR,'''') fabricadoporrefcli, coalesce(refcli.SAL_ENVASADOPOR,'''') envasadoporrefcli,';
+          bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' coalesce(refcli.SAL_DIASCADUCA,'''') diascaducarefcli, coalesce(refcli.SAL_CONSERVACION,'''') conservacionrefcli, coalesce(refcli.SAL_ANGRASASTOTAL,0) angrasastotalrefcli,coalesce(refcli.SAL_ANGTSATURADAS,0) angtsaturadasrefcli,';
+          bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' coalesce(refcli.SAL_ANHIDRACAR,0) anhidracarrefcli, coalesce(refcli.SAL_ANHCAZUCAR,0) anhcazucarrefcli,';
+          Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' coalesce(refcli.SAL_ANPROTEINAS,0) anproteinasrefcli, coalesce(refcli.SAL_ANSAL,0) ansalrefcli'
+      end
       else
-          Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas +' '''' referencia';
+      begin
+          Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas +' '''' referencia , '''' descartrefcli, ''''  ingredientesrefcli,''''  metoprodrefcli, ''''  alergenosrefcli, ''''  fabricadoporrefcli, ''''  envasadoporrefcli,'+
+                  ' '''' diascaducarefcli, '''' conservacionrefcli, 0  angrasastotalrefcli,0  angtsaturadasrefcli,0 anhidracarrefcli,0 anhcazucarrefcli,' +
+                  ' 0 anproteinasrefcli, 0 ansalrefcli';
+      end;
 
       Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' from ge_pesadas with(nolock) ' +
                   ' left outer join articulo with (nolock) on articulo.codart = GE_CODART' +
@@ -499,6 +613,13 @@ end;
 
 
 
+procedure TFrmPrincipal.edCodigoEtiquetaClick(Sender: TObject);
+begin
+   edCodigoEtiqueta.SelectAll;
+  
+
+end;
+
 procedure TFrmPrincipal.edCodigoEtiquetaExit(Sender: TObject);
 var
   lEtiqueta, lDescripcion:string;
@@ -510,14 +631,59 @@ begin
 
 end;
 
+procedure TFrmPrincipal.edImpresionClick(Sender: TObject);
+begin
+  if chkImpresion.Checked then
+  begin
+     chkImpresion.Checked := False;
+     edImpresion.Text := '';
+  end
+  else
+  begin
+    chkimpresion.Checked := true;
+    edImpresion.Text := 'V';
+  end;
+end;
+
+procedure TFrmPrincipal.edImpresionKeyPress(Sender: TObject; var Key: Char);
+begin
+  edImpresion.Text := '';
+end;
+
 procedure TFrmPrincipal.Edit1KeyPress(Sender: TObject; var Key: Char);
 begin
    if Key = '.' then
       Key := ',';
 end;
 
+procedure TFrmPrincipal.edLoteClick(Sender: TObject);
+begin
+    edLote.SelectAll;
+
+end;
+
+procedure TFrmPrincipal.edLoteExit(Sender: TObject);
+var
+  lCodTipo:string;
+  lTipo : string;
+begin
+   //Vamos a mostra un aviso con el codigo de producto que es ese lote
+   if edLote.Text <> '' then
+   begin
+      lCodTipo := copy(edlote.Text,1,2);
+      Bd.BuscarTipoArticulo(lCodTipo,lTipo);
+      if ltipo <> '' then
+         MessageDlg(lTipo, mtInformation, [mbOK], 0)
+      else
+         MessageDlg('El lote no pertenece a ningún tipo de articulo', mtError, [mbOK], 0);
+   end;
+
+
+end;
+
 procedure TFrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  GuardaConfiguracion;
   if Assigned(FraCxGridPesadas.dbtvDatos.DataController.DataSource) then
        if FraCxGridPesadas.dbtvDatos.DataController.DataSource.DataSet.RecordCount > 0 then
             FraCxGridPesadas.guardaGrid('\GestorEtiquetado\Pesadas');
@@ -525,6 +691,8 @@ begin
 end;
 
 procedure TFrmPrincipal.FormCreate(Sender: TObject);
+var
+  lEtiqueta, lDescEtiqueta: string;
 begin
    gFicheroIni := paramstr(1);
    Caption :=  Format(GetAppInfo('ProductName'), [GetAppInfo('ProductVersion')]);
@@ -552,10 +720,11 @@ begin
     Bd.InicializaNax;
 
    Show;
+  
    FraArticulo.inicializa(gFicheroIni, edArticulo);
    FraCliente.inicializa(gFicheroIni, edCliente);
    dtFechaPesada.Date := Now();
-
+   FFormularioCargado:= False;
    if not UsuarioValido then
      Application.Terminate;
 
@@ -566,7 +735,16 @@ begin
    btnIniciar.Caption := kIniPeso;
    cbOpciones.ItemIndex := 0;
    chkImpresion.Checked := bd.ImpresionAutomatica;
-
+   if chkImpresion.Checked then
+      edImpresion.Text := 'V'
+   else
+      edImpresion.Text := '';
+   FFormularioCargado:= True;
+   edCodigoEtiqueta.Text := bd.Etiqueta;
+   Bd.BuscarEtiqueta(edCodigoEtiqueta.Text,lEtiqueta, lDescEtiqueta );
+   edEtiqueta.Text := lEtiqueta;
+   edDescEtiqueta.Text := lDescEtiqueta;
+   CargaConfiguracion;
 
 end;
 
@@ -598,6 +776,7 @@ end;
 
 procedure TFrmPrincipal.FormShow(Sender: TObject);
 begin
+
   FraCliente.edCodigo.SetFocus;
 end;
 
@@ -607,14 +786,38 @@ begin
 
 end;
 
+procedure TFrmPrincipal.FraArticuloBttmaestroClick(Sender: TObject);
+begin
+ // FraArticulo.BttmaestroClick(Sender);
+  FraArticulo.Busqueda.acList.Actions[1].Enabled := true;
+  FraArticulo.Busqueda.acList.Actions[2].Enabled := true;
+  FraArticulo.Busqueda.Muestra('Obsoleto = ''F''');
+  FraArticulo.asignaResultado;
+  FraArticulo.Busqueda.acList.Actions[1].Enabled := false;
+  FraArticulo.Busqueda.acList.Actions[2].Enabled := false;
+
+end;
+
+procedure TFrmPrincipal.FraArticuloedCodigoClick(Sender: TObject);
+begin
+   FraArticulo.edcodigo.selectall;
+
+
+end;
+
 procedure TFrmPrincipal.FraArticuloedCodigoExit(Sender: TObject);
 var
   lEtiqueta, lDescEtiqueta: string;
 begin
   FraArticulo.edCodigoExit(Sender);
-  if FraArticulo.edCodigo.Text <> '' then
-  begin
-       edCodigoEtiqueta.Text := bd.BuscarEtiquetaArticulo(FraArticulo.edCodigo.Text);
+
+
+       //Ahora vemos si tiene una etiqueta asociada
+     if Bd.BuscarEtiquetaCliente(FraCliente.edCodigo.Text, FraArticulo.edCodigo.Text, lEtiqueta) then
+         edCodigoEtiqueta.Text := lEtiqueta
+     else
+         edCodigoEtiqueta.Text := bd.BuscarEtiquetaArticulo(FraArticulo.edCodigo.Text);
+
        if edCodigoEtiqueta.Text <> '' then
        begin
          bd.BuscarEtiqueta(edCodigoEtiqueta.Text,lEtiqueta, lDescEtiqueta);
@@ -623,11 +826,13 @@ begin
        end
        else
        begin
-         edEtiqueta.Text := '';
-         edDescEtiqueta.Text := '';
+         edCodigoEtiqueta.Text := Bd.Etiqueta;
+         bd.BuscarEtiqueta(edCodigoEtiqueta.Text,lEtiqueta, lDescEtiqueta);
+         edEtiqueta.Text := letiqueta;
+         edDescEtiqueta.Text := lDescEtiqueta;
        end;
 
-  end;
+
 end;
 
 procedure TFrmPrincipal.fraClienteacBusquedaExecute(Sender: TObject);
@@ -641,14 +846,101 @@ begin
 
 end;
 
+procedure TFrmPrincipal.fraClienteedCodigoClick(Sender: TObject);
+begin
+   FraCliente.edCodigo.selectall;
+
+
+end;
+
 procedure TFrmPrincipal.fraClienteedCodigoExit(Sender: TObject);
+var
+  lEtiqueta, lDescEtiqueta : string;
 begin
    FraCliente.edCodigoExit(Sender);
+   //Ahora vemos si tiene una etiqueta asociada
+   if Bd.BuscarEtiquetaCliente(FraCliente.edCodigo.Text, FraArticulo.edCodigo.Text, lEtiqueta) then
+         edCodigoEtiqueta.Text := lEtiqueta
+     else
+         edCodigoEtiqueta.Text := bd.BuscarEtiquetaArticulo(FraArticulo.edCodigo.Text);
+
+       if edCodigoEtiqueta.Text <> '' then
+       begin
+         bd.BuscarEtiqueta(edCodigoEtiqueta.Text,lEtiqueta, lDescEtiqueta);
+         edEtiqueta.Text := letiqueta;
+         edDescEtiqueta.Text := lDescEtiqueta;
+       end
+       else
+       begin
+         edCodigoEtiqueta.Text := Bd.Etiqueta;
+         bd.BuscarEtiqueta(edCodigoEtiqueta.Text,lEtiqueta, lDescEtiqueta);
+         edEtiqueta.Text := letiqueta;
+         edDescEtiqueta.Text := lDescEtiqueta;
+       end;
+
+
+
 end;
 
 function TFrmPrincipal.getPeso: Double;
 begin
   result := StrToFloat(edPeso.Value);
+end;
+
+procedure TFrmPrincipal.GuardaConfiguracion;
+var
+  ldirectorio, lresto :string;
+  lPos, lPosAnt : integer;
+  Ini: TIniFile;
+  IniFileName: string;
+begin
+
+
+        //Extraemos el nombre del directorio donde guardar la configuración del grid
+        lpos := 1;
+
+        lDirectorio := DirectorioSistema(sdAppData)+  '\GestionServidumbre\Principal';
+        lResto := lDirectorio;
+        lposAnt := 0;
+        while lpos > 0  do
+        begin
+            lposant := lposant + lpos;
+            lPos := pos('\',lResto);
+            if lpos > 0 then
+               lresto := copy(lresto,lpos+1,length(lresto));
+
+        end;
+
+        lDirectorio := copy(lDirectorio,0,lposant - 1);
+
+    //Vemos si existe el directorio, sino lo creamos
+     if not DirectoryExists(lDirectorio) then
+           if not ForceDirectories(lDirectorio) then
+           begin
+               MessageDlg('No se ha podido crear el directorio ' + lDirectorio + ' donde guardar la configuración del formulario ', mtError, [mbOK], 0);
+               Exit;
+           end;
+
+     IniFileName := DirectorioSistema(sdAppData)+  '\GestorEtiquetado\Principal' + 'Form.ini';
+     Ini := TIniFile.Create(IniFileName);
+      try
+        with Ini do
+        begin
+           if WindowState = wsNormal then
+           begin
+
+              WriteInteger('FormularioPrincipal', 'Left', Self.Left);
+              WriteInteger('FormularioPrincipal', 'Top', Self.Top);
+              WriteInteger('FormularioPrincipal', 'Width', Self.Width);
+              WriteInteger('FormularioPrincipal', 'Height', Self.Height);
+           end;
+           WriteInteger('FormularioPrincipal', 'WindowState', Integer(Self.WindowState));
+        end;
+      finally
+        Ini.Free;
+      end;
+
+
 end;
 
 procedure TFrmPrincipal.GuardarPesada;

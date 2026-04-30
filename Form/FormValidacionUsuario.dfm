@@ -3,7 +3,7 @@ object FrmValidacion: TFrmValidacion
   Top = 0
   Caption = 'Control de acceso'
   ClientHeight = 343
-  ClientWidth = 425
+  ClientWidth = 409
   Color = clGradientActiveCaption
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -72,6 +72,8 @@ object FrmValidacion: TFrmValidacion
     PasswordChar = '*'
     ShowHint = False
     TabOrder = 0
+    OnClick = ledClaveClick
+    OnEnter = ledClaveEnter
   end
   object bAcceder: TButton
     Left = 33

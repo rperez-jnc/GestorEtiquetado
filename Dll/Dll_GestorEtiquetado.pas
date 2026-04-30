@@ -2,13 +2,14 @@ unit Dll_GestorEtiquetado;
 
 interface
 
-Uses DmDatos, Dll_Modelo, Dialogs, System.UITypes, System.Classes, JncLib;
+Uses DmDatos, Dll_Modelo, Dialogs, System.UITypes, System.Classes, JncLib,System.variants;
 
 procedure INICIAR(Empresa: PAnsiChar); stdcall;
 procedure FINALIZAR; stdcall;
 procedure DESPUESDEGUARDARDOCUMENTOV2(Documento: AnsiString; IdDoc: Double; Estado: integer); stdcall;
 function REPINTAR(Tabla: AnsiString): boolean; stdcall;
-function ANTESDEGUARDARLINEAV2(Documento: AnsiString; Cabecera: variant; Linea: variant; Estado: integer; var PermitirGuardar: boolean): variant; stdcall;
+function ANTESDEGUARDARLINEACONDETALLEV2(Documento: AnsiString; Cabecera: variant; Linea: variant; Detalle: variant;
+  Estado: integer; var PermitirGuardar: boolean): variant; stdcall;
 
 
 Var
@@ -36,12 +37,16 @@ begin
 
 end;
 
-function ANTESDEGUARDARLINEAV2(Documento: AnsiString; Cabecera: variant; Linea: variant; Estado: integer; var PermitirGuardar: boolean): variant; stdcall;
+function ANTESDEGUARDARLINEACONDETALLEV2(Documento: AnsiString; Cabecera: variant; Linea: variant; Detalle: variant;
+  Estado: integer; var PermitirGuardar: boolean): variant; stdcall;
 var
   lIdreg: double;
   lNumLin: integer;
   lListaIdPesos : TStringList;
+  lFAO, lArte,lFAOC, lArteC:string;
+  lCodArt, lLote: string;
 BEGIN
+   PermitirGuardar := true;
    if ((documento = 'RE') and (Estado = 2)) then
    BEGIN
         lListaIdPesos := TStringList.Create;
@@ -60,6 +65,48 @@ BEGIN
 
 
    END;
+   if (((documento = 'RE') or (documento = 'TR') or (documento = 'AV') or (documento = 'FV')) and (Estado < 2)) then
+   BEGIN
+
+       result := varArrayCreate([0, 2], varVariant);
+         result[0] := 2;
+
+       lCodArt := TInternoDLL.GetValorCampoVarStr(Linea, 'CodArt');
+       lLote := TInternoDLL.GetValorCampoDetalleStr(Detalle, 'Lote');
+       lFAo := ifnull(TInternoDLL.GetValorCampoVarStr(Linea, 'Sal_Fao'),'');
+       lArte := ifnull(TInternoDLL.GetValorCampoVarStr(Linea, 'SAl_ArtePesca'),'');
+
+       if ((lFAO = '') or (lArte = '')) then
+       begin
+
+         //Buscamos la compra del lote y ponermos el arte de pesca y la Fao
+         Bd.BuscarFaoArte(lCodArt, lLote, lFaoC, lArteC );
+         if lFao = '' then
+           if lFAOC <> '' then
+               result[1] := VarArrayOf(['SAl_Fao', lFAOC])
+           else
+           result[1] := VarArrayOf(['SAl_Fao', Null])
+         else
+           result[1] := VarArrayOf(['SAl_Fao', lFAO]);
+
+         if lArte = '' then
+           if lArteC <> '' then
+               result[2] := VarArrayOf(['SAl_ArtePesca', lArteC])
+           else
+           result[2] := VarArrayOf(['SAl_ArtePesca', Null])
+         else
+           result[2] := VarArrayOf(['SAl_ArtePesca', lArte]);
+
+
+       end
+       else
+       begin
+         result[1] := VarArrayOf(['SAl_Fao', lFAO]);
+         result[2] := VarArrayOf(['SAl_ArtePesca', lArte]);
+       end;
+
+
+   END;
 END;
 procedure DESPUESDEGUARDARDOCUMENTOV2(Documento: AnsiString; IdDoc: Double; Estado: integer); stdcall;
 var
@@ -71,8 +118,8 @@ begin
 
   if ((documento = 'RE') and (Estado < 2)) then
   begin
-      bd.CalculaYGuardaFAO(IdDoc, lFao, lArte);
-      bd.AsignarFAO(IdDoc, lFao, lArte);
+      if bd.CalculaYGuardaFAO(IdDoc, lFao, lArte) then
+         bd.AsignarFAO(IdDoc, lFao, lArte);
   end;
 end;
 end.

@@ -13,7 +13,8 @@ uses
   JncMaestro in '..\..\comun\frames\JncMaestro.pas' {fraMaestro: TFrame},
   dmImagenesGrande in '..\..\comun\img\dmImagenesGrande.pas' {dmImagesGrande: TDataModule},
   JncFraCxGrid in '..\..\comun\frames\JncFraCxGrid.pas' {fraCxGrid: TFrame},
-  FormEtiquetas in 'Form\FormEtiquetas.pas' {FrmEtiquetas};
+  FormEtiquetas in 'Form\FormEtiquetas.pas' {FrmEtiquetas},
+  FormTeclado in 'Form\FormTeclado.pas' {FrmTeclado};
 
 {$R *.res}
 
@@ -22,6 +23,6 @@ begin
   Application.MainFormOnTaskbar := False;
   Application.CreateForm(TFrmPrincipal, FrmPrincipal);
   Application.CreateForm(TdmImagesGrande, dmImagesGrande);
-  Application.CreateForm(TFrmEtiquetas, FrmEtiquetas);
+
   Application.Run;
 end.

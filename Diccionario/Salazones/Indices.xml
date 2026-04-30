@@ -13,5 +13,12 @@
 </METADATA>
 <ROWDATA>
 <ROW Tabla="SAL_FAO" Indice="PK_SAL_FAO" Columnas="FAO" Clave="TRUE" Unico="FALSE" Agrupado="TRUE"/>
+<ROW Tabla="SAL_ARTEPESCA" Indice="PK_SAL_ARTEPESCA" Columnas="SAL_ARTEPESCA" Clave="TRUE" Unico="FALSE" Agrupado="TRUE"/>
+<ROW Tabla="LINEALBA" Indice="IDX_FKSAL_FAOLINEALBA00" Columnas="SAL_FAO" Clave="FALSE" Unico="FALSE" Agrupado="FALSE"/>
+<ROW Tabla="LINEALBA" Indice="IDX_FKSAL_ARTEPESCLINEALBA00" Columnas="SAL_ARTEPESCA" Clave="FALSE" Unico="FALSE" Agrupado="FALSE"/>
+<ROW Tabla="LINEFACT" Indice="IDX_FKSAL_ARTEPESCLINEFACT00" Columnas="SAL_ARTEPESCA" Clave="FALSE" Unico="FALSE" Agrupado="FALSE"/>
+<ROW Tabla="SAL_TIPOARTICULOS" Indice="PK_SAL_TIPOARTICULOS" Columnas="SAL_CODTIPO" Clave="TRUE" Unico="FALSE" Agrupado="TRUE"/>
+<ROW Tabla="LINETRAS" Indice="IDX_FKSAL_ARTEPESCLINETRAS00" Columnas="SAL_ARTEPESCA" Clave="FALSE" Unico="FALSE" Agrupado="FALSE"/>
+<ROW Tabla="LINETRAS" Indice="IDX_FKSAL_FAOLINETRAS00" Columnas="SAL_FAO" Clave="FALSE" Unico="FALSE" Agrupado="FALSE"/>
 </ROWDATA>
 </DATAPACKET>

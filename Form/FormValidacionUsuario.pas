@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, DmDatos, Vcl.StdCtrls, Vcl.ExtCtrls;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, DmDatos, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Touch.Keyboard, AdvTouchKeyboard, FormTeclado;
 
 type
   TFrmValidacion = class(TForm)
@@ -17,6 +18,8 @@ type
 
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure ledClaveClick(Sender: TObject);
+    procedure ledClaveEnter(Sender: TObject);
   private
     FValido: boolean;
     FBd: TdmdDatos;
@@ -34,7 +37,7 @@ type
 
 var
   FrmValidacion: TFrmValidacion;
-
+  TecladoFlotante : TFrmTeclado;
 implementation
 
 {$R *.dfm}
@@ -74,7 +77,7 @@ begin
    end;
 end;
 
-procedure TFrmValidacion.FormClose(Sender: TObject; var Action: TCloseAction);
+Procedure TFrmValidacion.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Close;
 end;
@@ -84,6 +87,7 @@ end;
 procedure TFrmValidacion.FormShow(Sender: TObject);
 begin
     cbUsuario.SetFocus;
+
 end;
 
 function TFrmValidacion.GetIDComputerName: String;
@@ -105,6 +109,21 @@ begin
   CargaComboUsuarios;
 
 
+
+end;
+
+procedure TFrmValidacion.ledClaveClick(Sender: TObject);
+begin
+  ledClave.selectall;
+end;
+
+procedure TFrmValidacion.ledClaveEnter(Sender: TObject);
+begin
+   TecladoFlotante := TfrmTeclado.Create(Self);
+   TecladoFlotante.ShowModal;
+   ledClave.Text := TecladoFlotante.Texto;
+   TecladoFlotante.Free;
+   bAcceder.setfocus;
 end;
 
 end.

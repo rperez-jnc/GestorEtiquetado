@@ -18,5 +18,9 @@
 <ROW TablaPadre="SAL_FAO" TablaHija="LINEFACT" CamposPadre="FAO" CamposHija="SAL_FAO" TipoRelacion="R" TipoRelacionU="C"/>
 <ROW TablaPadre="SAL_FAO" TablaHija="LINEALBA" CamposPadre="FAO" CamposHija="SAL_FAO" TipoRelacion="R" TipoRelacionU="C"/>
 <ROW TablaPadre="SAL_ARTEPESCA" TablaHija="LINEREGU" CamposPadre="SAL_ARTEPESCA" CamposHija="SAL_ARTEPESCA" TipoRelacion="R" TipoRelacionU="C"/>
+<ROW TablaPadre="SAL_ARTEPESCA" TablaHija="LINEALBA" CamposPadre="SAL_ARTEPESCA" CamposHija="SAL_ARTEPESCA" TipoRelacion="R" TipoRelacionU="C"/>
+<ROW TablaPadre="SAL_ARTEPESCA" TablaHija="LINEFACT" CamposPadre="SAL_ARTEPESCA" CamposHija="SAL_ARTEPESCA" TipoRelacion="R" TipoRelacionU="C"/>
+<ROW TablaPadre="SAL_ARTEPESCA" TablaHija="LINETRAS" CamposPadre="SAL_ARTEPESCA" CamposHija="SAL_ARTEPESCA" TipoRelacion="R" TipoRelacionU="C"/>
+<ROW TablaPadre="SAL_FAO" TablaHija="LINETRAS" CamposPadre="FAO" CamposHija="SAL_FAO" TipoRelacion="R" TipoRelacionU="C"/>
 </ROWDATA>
 </DATAPACKET>
