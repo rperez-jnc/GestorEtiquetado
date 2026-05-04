@@ -1,0 +1,46 @@
+object FrmMensaje: TFrmMensaje
+  Left = 0
+  Top = 0
+  ClientHeight = 352
+  ClientWidth = 834
+  Color = clGradientActiveCaption
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  PixelsPerInch = 96
+  TextHeight = 13
+  object lMensaje: TLabel
+    Left = 8
+    Top = 128
+    Width = 818
+    Height = 42
+    Alignment = taCenter
+    AutoSize = False
+    Caption = 'lMensaje'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -35
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object btnOk: TBitBtn
+    Left = 681
+    Top = 286
+    Width = 145
+    Height = 41
+    Caption = 'OK'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 0
+    OnClick = btnOkClick
+  end
+end

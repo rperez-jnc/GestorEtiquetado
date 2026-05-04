@@ -8,7 +8,7 @@ uses
   JncMaestro, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Buttons, dmImagenesGrande,
   JncFraCxGrid, DmBascula, JvExStdCtrls, JvEdit, JvValidateEdit, BasculaModelo, FormEtiquetas,
   System.Actions, Vcl.ActnList, JncGridDx, frxClass, frxBarcode, Vcl.Menus,
-  Vcl.Touch.Keyboard, IniFiles;
+  Vcl.Touch.Keyboard, IniFiles, FormMensaje;
 
 type
   TFrmPrincipal = class(TForm)
@@ -22,7 +22,6 @@ type
     dtFechaPesada: TDateTimePicker;
     edUsuario: TEdit;
     edPersona: TEdit;
-    chkImpresion: TCheckBox;
     Panel4: TPanel;
     btnSalir: TButton;
     btnIniciar: TButton;
@@ -55,12 +54,14 @@ type
     BtnCliente: TBitBtn;
     btnArticulo: TBitBtn;
     btnEtiqueta: TBitBtn;
-    edImpresion: TEdit;
     BtnUsuario: TBitBtn;
     Panel6: TPanel;
     TecladoFlotanteP: TTouchKeyboard;
     btnTeclado: TBitBtn;
     btnConfiguracion: TBitBtn;
+    Panel7: TPanel;
+    edImpresion: TEdit;
+    chkImpresion: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure btnIniciarClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -97,6 +98,7 @@ type
     procedure edLoteClick(Sender: TObject);
     procedure btnTecladoClick(Sender: TObject);
     procedure btnConfiguracionClick(Sender: TObject);
+    procedure edLoteKeyPress(Sender: TObject; var Key: Char);
   private
     FFIcheroIni: TFileName;
     FBd: TdmdDatos;
@@ -129,6 +131,7 @@ type
 var
   FrmPrincipal: TFrmPrincipal;
   SavedWindowState: integer;
+  MostradoMensaje: boolean;
 const
   kIniPeso = 'Inicio pesadas';
   kFinPeso = 'Fin pesadas';
@@ -452,11 +455,12 @@ end;
 
 procedure TFrmPrincipal.BtnUsuarioClick(Sender: TObject);
 begin
-   if not UsuarioValido then
-     Application.Terminate;
+   if UsuarioValido then
+   begin
 
-   edUsuario.Text := bd.UsuarioLog;
-   edPersona.Text := bd.Persona;
+     edUsuario.Text := bd.UsuarioLog;
+     edPersona.Text := bd.Persona;
+   end;
 end;
 
 procedure TFrmPrincipal.BuscaEtiqueta;
@@ -666,19 +670,39 @@ procedure TFrmPrincipal.edLoteExit(Sender: TObject);
 var
   lCodTipo:string;
   lTipo : string;
+  lMensaje : TfrmMensaje;
 begin
-   //Vamos a mostra un aviso con el codigo de producto que es ese lote
-   if edLote.Text <> '' then
-   begin
-      lCodTipo := copy(edlote.Text,1,2);
-      Bd.BuscarTipoArticulo(lCodTipo,lTipo);
-      if ltipo <> '' then
-         MessageDlg(lTipo, mtInformation, [mbOK], 0)
-      else
-         MessageDlg('El lote no pertenece a ningún tipo de articulo', mtError, [mbOK], 0);
-   end;
 
 
+     //Vamos a mostra un aviso con el codigo de producto que es ese lote
+     if edLote.Text <> '' then
+     begin
+        lMensaje := TFrmMensaje.Create(Self);
+        lCodTipo := copy(edlote.Text,1,2);
+        Bd.BuscarTipoArticulo(lCodTipo,lTipo);
+        if ltipo <> '' then
+           lMensaje.Inicializa(lTipo)
+
+        else
+           lMensaje.Inicializa('El lote no pertenece a ningún tipo de articulo');
+
+        lMensaje.ShowModal;
+        lMensaje.Free;
+
+     end;
+
+
+
+
+end;
+
+procedure TFrmPrincipal.edLoteKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    edLoteExit(Sender);
+    MostradoMensaje := true;
+  end;
 end;
 
 procedure TFrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -745,7 +769,7 @@ begin
    edEtiqueta.Text := lEtiqueta;
    edDescEtiqueta.Text := lDescEtiqueta;
    CargaConfiguracion;
-
+   MostradoMensaje := False;
 end;
 
 procedure TFrmPrincipal.FormKeyDown(Sender: TObject; var Key: Word;

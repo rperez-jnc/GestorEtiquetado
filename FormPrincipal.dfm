@@ -334,21 +334,6 @@
       ParentBiDiMode = False
       ParentFont = False
     end
-    object chkImpresion: TCheckBox
-      Left = 672
-      Top = 22
-      Width = 209
-      Height = 17
-      Anchors = [akTop, akRight]
-      Caption = 'Impresi'#243'n autom'#225'tica'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -16
-      Font.Name = 'Tahoma'
-      Font.Style = [fsBold]
-      ParentFont = False
-      TabOrder = 1
-    end
     object edLote: TEdit
       Left = 106
       Top = 19
@@ -386,7 +371,7 @@
       ImageMargins.Left = 10
       Images = dmImagesGrande.imgListaImagenes
       ParentFont = False
-      TabOrder = 2
+      TabOrder = 1
       OnClick = btnIniciarClick
     end
     object CbOpciones: TComboBox
@@ -401,7 +386,7 @@
       Font.Name = 'Tahoma'
       Font.Style = []
       ParentFont = False
-      TabOrder = 3
+      TabOrder = 2
       Text = 'Pend. regularizar'
       OnChange = CbOpcionesChange
       Items.Strings = (
@@ -412,7 +397,7 @@
     end
     object Button1: TButton
       AlignWithMargins = True
-      Left = 910
+      Left = 950
       Top = 10
       Width = 193
       Height = 41
@@ -427,24 +412,51 @@
       ImageMargins.Left = 10
       Images = dmImagesGrande.imgListaImagenes
       ParentFont = False
-      TabOrder = 4
+      TabOrder = 3
       OnClick = Button1Click
     end
-    object edImpresion: TEdit
-      Left = 652
-      Top = 16
-      Width = 33
-      Height = 33
-      AutoSize = False
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -21
-      Font.Name = 'Tahoma'
-      Font.Style = [fsBold]
-      ParentFont = False
-      TabOrder = 5
-      OnClick = edImpresionClick
-      OnKeyPress = edImpresionKeyPress
+    object Panel7: TPanel
+      Left = 648
+      Top = 6
+      Width = 265
+      Height = 52
+      Anchors = [akTop, akRight]
+      TabOrder = 4
+      DesignSize = (
+        265
+        52)
+      object chkImpresion: TCheckBox
+        Left = 35
+        Top = 22
+        Width = 209
+        Height = 17
+        Anchors = [akTop, akRight]
+        Caption = 'Impresi'#243'n autom'#225'tica'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 1
+      end
+      object edImpresion: TEdit
+        Left = 17
+        Top = 11
+        Width = 33
+        Height = 33
+        Alignment = taRightJustify
+        AutoSize = False
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -21
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 0
+        OnClick = edImpresionClick
+        OnKeyPress = edImpresionKeyPress
+      end
     end
   end
   object Panel3: TPanel
@@ -1400,7 +1412,7 @@
     TabOrder = 4
     ExplicitTop = 285
     ExplicitWidth = 1350
-    ExplicitHeight = 330
+    ExplicitHeight = 83
     inherited Panel1: TPanel
       Width = 1350
       ExplicitWidth = 1350
@@ -1409,7 +1421,7 @@
       Width = 1350
       Height = 59
       ExplicitWidth = 1350
-      ExplicitHeight = 306
+      ExplicitHeight = 59
       inherited dbtvDatos: TcxGridDBTableView
         PopupMenu = PopupMenu1
         OptionsSelection.MultiSelect = True
@@ -1486,10 +1498,6 @@
       GradientEnd = clSilver
       GradientStart = clGray
       Layout = 'Standard'
-      ExplicitLeft = 424
-      ExplicitTop = 176
-      ExplicitWidth = 550
-      ExplicitHeight = 180
     end
   end
   object tmPeso: TTimer
