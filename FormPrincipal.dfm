@@ -27,6 +27,8 @@
     Height = 172
     Align = alTop
     TabOrder = 0
+    ExplicitLeft = 27
+    ExplicitTop = 52
     DesignSize = (
       1350
       172)
@@ -93,7 +95,7 @@
     inline FraArticulo: TfraMaestro
       Left = 103
       Top = 63
-      Width = 1207
+      Width = 1246
       Height = 41
       Anchors = [akLeft, akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
@@ -105,7 +107,7 @@
       TabOrder = 1
       ExplicitLeft = 103
       ExplicitTop = 63
-      ExplicitWidth = 1207
+      ExplicitWidth = 1246
       ExplicitHeight = 41
       inherited Bttmaestro: TBitBtn [0]
         Left = 103
@@ -131,12 +133,12 @@
       end
       inherited edNombre: TEdit [2]
         Left = 103
-        Width = 1087
+        Width = 1128
         Height = 27
         Anchors = [akLeft, akTop, akRight]
         Font.Height = -16
         ExplicitLeft = 103
-        ExplicitWidth = 1087
+        ExplicitWidth = 1114
         ExplicitHeight = 27
       end
       inherited Acciones: TActionList
@@ -191,7 +193,7 @@
     object edDescEtiqueta: TEdit
       Left = 592
       Top = 110
-      Width = 700
+      Width = 742
       Height = 27
       Anchors = [akLeft, akTop, akRight]
       BiDiMode = bdLeftToRight
@@ -208,7 +210,7 @@
     inline fraCliente: TfraMaestro
       Left = 103
       Top = 19
-      Width = 1207
+      Width = 1246
       Height = 41
       Anchors = [akLeft, akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
@@ -220,7 +222,7 @@
       TabOrder = 0
       ExplicitLeft = 103
       ExplicitTop = 19
-      ExplicitWidth = 1207
+      ExplicitWidth = 1246
       ExplicitHeight = 41
       inherited Bttmaestro: TBitBtn [0]
         Left = 103
@@ -246,12 +248,12 @@
       end
       inherited edNombre: TEdit [2]
         Left = 103
-        Width = 1087
+        Width = 1128
         Height = 27
         Anchors = [akLeft, akTop, akRight]
         Font.Height = -16
         ExplicitLeft = 103
-        ExplicitWidth = 1087
+        ExplicitWidth = 1128
         ExplicitHeight = 27
       end
       inherited Acciones: TActionList
@@ -264,7 +266,7 @@
       end
     end
     object BtnCliente: TBitBtn
-      Left = 7
+      Left = 5
       Top = 19
       Width = 92
       Height = 34
@@ -521,9 +523,10 @@
     object edPersona: TEdit
       Left = 529
       Top = 16
-      Width = 765
+      Width = 805
       Height = 27
       TabStop = False
+      Anchors = [akLeft, akTop, akRight]
       BiDiMode = bdLeftToRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -553,17 +556,18 @@
   end
   object Panel4: TPanel
     Left = 0
-    Top = 671
+    Top = 368
     Width = 1350
     Height = 58
     Align = alBottom
     TabOrder = 3
+    ExplicitTop = 185
     DesignSize = (
       1350
       58)
     object btnSalir: TButton
       AlignWithMargins = True
-      Left = 1184
+      Left = 1194
       Top = 6
       Width = 140
       Height = 41
@@ -582,7 +586,7 @@
       OnClick = btnSalirClick
     end
     object btnImprimir: TBitBtn
-      Left = 827
+      Left = 830
       Top = 6
       Width = 161
       Height = 41
@@ -729,7 +733,7 @@
       OnClick = btnImprimirClick
     end
     object btnRegularizar: TBitBtn
-      Left = 994
+      Left = 1012
       Top = 6
       Width = 161
       Height = 41
@@ -1262,7 +1266,7 @@
       OnClick = btnTecladoClick
     end
     object btnConfiguracion: TBitBtn
-      Left = 776
+      Left = 768
       Top = 6
       Width = 45
       Height = 41
@@ -1436,11 +1440,12 @@
   end
   object Panel5: TPanel
     Left = 0
-    Top = 615
+    Top = 673
     Width = 1350
     Height = 56
     Align = alBottom
     TabOrder = 5
+    ExplicitTop = 615
     DesignSize = (
       1350
       56)
@@ -1483,12 +1488,13 @@
   end
   object Panel6: TPanel
     Left = 0
-    Top = 368
+    Top = 426
     Width = 1350
     Height = 247
     Align = alBottom
     TabOrder = 6
     Visible = False
+    ExplicitTop = 368
     object TecladoFlotanteP: TTouchKeyboard
       Left = 1
       Top = 1

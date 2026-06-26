@@ -3,12 +3,12 @@
 	<Transactions>
     <Transaction>2024/06/05 11:14:54.000.461,=C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2024/12/18 12:38:53.000.550,=C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2026/04/01 11:59:09.000.799,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\DllGestorEtiquetado.dproj=C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2026/04/01 11:59:09.000.799,C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Project1.dproj=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\DllGestorEtiquetado.dproj</Transaction>
     <Transaction>2026/04/01 11:59:45.000.887,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas</Transaction>
-    <Transaction>2026/04/01 11:59:58.000.472,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Dll_GestorEtiquetado.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas</Transaction>
+    <Transaction>2026/04/01 11:59:58.000.472,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Dll_GestorEtiquetado.pas</Transaction>
     <Transaction>2026/04/01 12:05:38.000.922,=E:\Repositorios\comun\dlls\DLL_dmEstandar.pas</Transaction>
     <Transaction>2026/04/01 12:06:01.000.442,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas</Transaction>
-    <Transaction>2026/04/01 12:06:58.000.995,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Datos\DmDatos.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas</Transaction>
-    <Transaction>2026/04/01 12:06:58.000.995,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Datos\DmDatos.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.dfm</Transaction>
+    <Transaction>2026/04/01 12:06:58.000.995,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Datos\DmDatos.pas</Transaction>
+    <Transaction>2026/04/01 12:06:58.000.995,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Datos\DmDatos.dfm</Transaction>
   </Transactions>
 </BorlandProject>
