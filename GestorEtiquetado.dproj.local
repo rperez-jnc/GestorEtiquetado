@@ -4,14 +4,14 @@
     <Transaction>2024/06/05 11:14:54.000.461,=C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2024/12/18 12:38:53.000.550,=C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2026/01/12 14:57:29.000.747,=C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2026/01/12 15:00:09.000.559,E:\Repositorios\SalazonesSaez\GestorEtiquetado\FormPrincipal.dfm=C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
-    <Transaction>2026/01/12 15:00:09.000.559,E:\Repositorios\SalazonesSaez\GestorEtiquetado\FormPrincipal.pas=C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2026/01/12 15:00:23.000.842,E:\Repositorios\SalazonesSaez\GestorEtiquetado\GestorEtiquetado.dproj=C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2026/01/12 15:00:09.000.559,C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Unit1.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\FormPrincipal.dfm</Transaction>
+    <Transaction>2026/01/12 15:00:09.000.559,C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Unit1.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\FormPrincipal.pas</Transaction>
+    <Transaction>2026/01/12 15:00:23.000.842,C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Project1.dproj=E:\Repositorios\SalazonesSaez\GestorEtiquetado\GestorEtiquetado.dproj</Transaction>
     <Transaction>2026/01/12 15:02:33.000.667,=E:\Repositorios\comun\modulos\SQLServerDataModule.pas</Transaction>
     <Transaction>2026/01/12 15:02:33.000.501,=E:\Repositorios\comun\modulos\IniDataModule.pas</Transaction>
     <Transaction>2026/01/12 15:02:42.000.258,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.pas</Transaction>
-    <Transaction>2026/01/12 15:03:06.000.946,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Datos\DmDatos.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.dfm</Transaction>
-    <Transaction>2026/01/12 15:03:06.000.946,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Datos\DmDatos.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.pas</Transaction>
+    <Transaction>2026/01/12 15:03:06.000.946,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Datos\DmDatos.pas</Transaction>
+    <Transaction>2026/01/12 15:03:06.000.946,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Datos\DmDatos.dfm</Transaction>
     <Transaction>2026/01/13 08:29:13.000.370,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Docs\config.ini</Transaction>
     <Transaction>2026/01/13 08:33:05.000.928,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Datos\DmBascula.pas</Transaction>
     <Transaction>2026/01/13 08:33:47.000.188,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Datos\BasculaModelo.pas</Transaction>
@@ -21,13 +21,13 @@
     <Transaction>2026/01/13 12:41:23.000.312,=E:\Repositorios\comun\img\dmImagenesGrande.pas</Transaction>
     <Transaction>2026/01/13 12:45:30.000.586,=E:\Repositorios\comun\frames\JncFraCxGrid.pas</Transaction>
     <Transaction>2026/01/20 13:15:29.000.758,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.pas</Transaction>
-    <Transaction>2026/01/20 13:15:51.000.868,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormEtiquetas.pas</Transaction>
-    <Transaction>2026/01/20 13:15:51.000.868,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormEtiquetas.dfm</Transaction>
+    <Transaction>2026/01/20 13:15:51.000.868,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormEtiquetas.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.dfm</Transaction>
+    <Transaction>2026/01/20 13:15:51.000.868,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormEtiquetas.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.pas</Transaction>
     <Transaction>2026/04/29 10:54:56.000.079,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.pas</Transaction>
-    <Transaction>2026/04/29 10:55:34.000.941,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormTeclado.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.dfm</Transaction>
-    <Transaction>2026/04/29 10:55:34.000.941,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormTeclado.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.pas</Transaction>
+    <Transaction>2026/04/29 10:55:34.000.941,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormTeclado.pas</Transaction>
+    <Transaction>2026/04/29 10:55:34.000.941,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormTeclado.dfm</Transaction>
     <Transaction>2026/05/04 09:44:34.000.001,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.pas</Transaction>
-    <Transaction>2026/05/04 09:45:39.000.217,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormMensaje.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.dfm</Transaction>
-    <Transaction>2026/05/04 09:45:39.000.217,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormMensaje.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.pas</Transaction>
+    <Transaction>2026/05/04 09:45:39.000.217,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormMensaje.pas</Transaction>
+    <Transaction>2026/05/04 09:45:39.000.217,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Unit1.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormMensaje.dfm</Transaction>
   </Transactions>
 </BorlandProject>

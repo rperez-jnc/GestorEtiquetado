@@ -27,8 +27,6 @@
     Height = 172
     Align = alTop
     TabOrder = 0
-    ExplicitLeft = 27
-    ExplicitTop = 52
     DesignSize = (
       1350
       172)
@@ -138,7 +136,7 @@
         Anchors = [akLeft, akTop, akRight]
         Font.Height = -16
         ExplicitLeft = 103
-        ExplicitWidth = 1114
+        ExplicitWidth = 1128
         ExplicitHeight = 27
       end
       inherited Acciones: TActionList
@@ -561,7 +559,6 @@
     Height = 58
     Align = alBottom
     TabOrder = 3
-    ExplicitTop = 185
     DesignSize = (
       1350
       58)
@@ -1445,7 +1442,6 @@
     Height = 56
     Align = alBottom
     TabOrder = 5
-    ExplicitTop = 615
     DesignSize = (
       1350
       56)
@@ -1494,7 +1490,6 @@
     Align = alBottom
     TabOrder = 6
     Visible = False
-    ExplicitTop = 368
     object TecladoFlotanteP: TTouchKeyboard
       Left = 1
       Top = 1

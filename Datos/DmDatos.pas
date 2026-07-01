@@ -202,13 +202,14 @@ begin
     close;
     sql.Clear;
 
-    sql.Add('select numlin, ge_listaidpesos from lineregu with(nolock)');
+   // sql.Add('select numlin, ge_listaidpesos from lineregu with(nolock)');
+    sql.Add('select numlin from lineregu with(nolock)');
     sql.Add('where idreg = ' + formateafloatsql(vidReg));
 
     open;
-
-    first;
-    while not eof do
+     lNumlin := fieldbyname('NumLin').AsInteger;
+    (*first;  *)
+   (* while not eof do
     begin
       lListaPesadas := TStringList.Create;
       lListaPesadas.Delimiter := ',';
@@ -221,7 +222,7 @@ begin
         exit;
       end;
       next;
-    end;
+    end;   *)
 
   end;
 end;
@@ -447,16 +448,20 @@ begin
   try
     NaxRegularizacion.NuevaLinea;
     NaxRegularizacion.AsStringLin['CodArt']:= vCodArt;
+
     NaxRegularizacion.AsFloatLin['Unidades']:= vPeso;
-    NaxRegularizacion.AsStringLin['GE_ListaIdPesos']:= vListPesos.DelimitedText;
+    //NaxRegularizacion.AsStringLin['GE_ListaIdPesos']:= vListPesos.DelimitedText;
 
     if UsaLotes(vCodArt) then
     begin
+
       NaxRegularizacion.AnadirDetalle(vPeso,'',vLote,'','');
     end;
     NaxRegularizacion.AnadirLinea;
 
-  finally
+  except
+   on e:exception do
+      showmessage(e.message);
   end;
 end;
 
@@ -668,7 +673,7 @@ begin
     sql.Clear;
 
     sql.Add('Update ge_pesadas set ge_idregu = ' + formateafloatsql(vIdRegu));
-    sql.Add(', ge_numlinreg = ' + formateafloatsql(vNumLin));
+    //sql.Add(', ge_numlinreg = ' + formateafloatsql(vNumLin));
     sql.Add('where ge_id = ' + formateafloatsql(vId));
 
     execsql;
@@ -725,7 +730,7 @@ begin
           sql.Clear;
 
           sql.Add('Update ge_pesadas set ge_idregu = ' + formateafloatsql(vIdReg));
-          sql.Add(', ge_numlinreg = ' + inttostr(lNumLin));
+        //  sql.Add(', ge_numlinreg = ' + inttostr(lNumLin));
           sql.Add(' where ge_id = ' + formateafloatsql(lId));
 
           execsql;
@@ -754,6 +759,7 @@ end;
 
 function TdmdDatos.UsaLotes(vCodArt: string): boolean;
 begin
+
   with sqlConsulta do
   begin
     close;
