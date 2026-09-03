@@ -7,8 +7,8 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, DmDatos, JncLib, FormValidacionUsuario, Maestro,
   JncMaestro, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Buttons, dmImagenesGrande,
   JncFraCxGrid, DmBascula, JvExStdCtrls, JvEdit, JvValidateEdit, BasculaModelo, FormEtiquetas,
-  System.Actions, Vcl.ActnList, JncGridDx, frxClass, frxBarcode, Vcl.Menus,
-  Vcl.Touch.Keyboard, IniFiles, FormMensaje;
+  System.Actions, Vcl.ActnList, JncGridDx, frxClass, frxBarcode, Vcl.Menus,FormTeclado,
+  Vcl.Touch.Keyboard, IniFiles, FormMensaje, ShellAPI;
 
 type
   TFrmPrincipal = class(TForm)
@@ -44,7 +44,7 @@ type
     CbOpciones: TComboBox;
     Button1: TButton;
     btnGuardarPesada: TBitBtn;
-    Edit1: TEdit;
+    edPesoManual: TEdit;
     fraCliente: TfraMaestro;
     frxCodBarras: TfrxBarCodeObject;
     frxReport: TfrxReport;
@@ -55,13 +55,13 @@ type
     btnArticulo: TBitBtn;
     btnEtiqueta: TBitBtn;
     BtnUsuario: TBitBtn;
-    Panel6: TPanel;
-    TecladoFlotanteP: TTouchKeyboard;
-    btnTeclado: TBitBtn;
     btnConfiguracion: TBitBtn;
     Panel7: TPanel;
     edImpresion: TEdit;
     chkImpresion: TCheckBox;
+    acCambiaretiqueta: TMenuItem;
+    EdCantidad: TEdit;
+    Label3: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure btnIniciarClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -85,7 +85,7 @@ type
     procedure fraClienteBttmaestroClick(Sender: TObject);
     procedure fraClienteacBusquedaExecute(Sender: TObject);
     procedure btnDiseñarEtiquetaClick(Sender: TObject);
-    procedure Edit1KeyPress(Sender: TObject; var Key: Char);
+    procedure edPesoManualKeyPress(Sender: TObject; var Key: Char);
     procedure pmeliminarpesadaClick(Sender: TObject);
     procedure FraArticuloBttmaestroClick(Sender: TObject);
     procedure edLoteExit(Sender: TObject);
@@ -96,9 +96,13 @@ type
     procedure FraArticuloedCodigoClick(Sender: TObject);
     procedure edCodigoEtiquetaClick(Sender: TObject);
     procedure edLoteClick(Sender: TObject);
-    procedure btnTecladoClick(Sender: TObject);
+
     procedure btnConfiguracionClick(Sender: TObject);
     procedure edLoteKeyPress(Sender: TObject; var Key: Char);
+    procedure edPesoManualEnter(Sender: TObject);
+    procedure edPesoManualClick(Sender: TObject);
+    procedure acCambiaretiquetaClick(Sender: TObject);
+    procedure EdCantidadClick(Sender: TObject);
   private
     FFIcheroIni: TFileName;
     FBd: TdmdDatos;
@@ -133,8 +137,8 @@ var
   SavedWindowState: integer;
   MostradoMensaje: boolean;
 const
-  kIniPeso = 'Inicio pesadas';
-  kFinPeso = 'Fin pesadas';
+  kIniPeso = 'Pesar';
+  kFinPeso = 'Fin';
 
 implementation
 
@@ -144,6 +148,28 @@ procedure TFrmPrincipal.AcBuscaEtiquetaExecute(Sender: TObject);
 begin
   if edCodigoEtiqueta.Focused then
     BuscaEtiqueta;
+end;
+
+procedure TFrmPrincipal.acCambiaretiquetaClick(Sender: TObject);
+var
+  lId: double;
+    lfrmEtiquetas : TfrmEtiquetas;
+    lCodigoEtiqueta : string;
+begin
+  lId := TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[0].RecordIndex,'ge_Id');
+
+  lfrmEtiquetas := TfrmEtiquetas.Create(Self);
+  lfrmEtiquetas.Inicializa(Bd);
+  lfrmEtiquetas.ShowModal;
+
+
+  lCodigoEtiqueta := lFrmEtiquetas.Codigo;
+
+  lFrmEtiquetas.Free;
+
+   Bd.CambiarEtiqueta(Lid,lCodigoEtiqueta);
+   CargaLecturas(cbOpciones.ItemIndex, edLote.Text);
+
 end;
 
 procedure TFrmPrincipal.activaTimerPeso(vEstado: Boolean);
@@ -192,7 +218,7 @@ var
 begin
   if bd.ValidarDatos(FraArticulo.edCodigo.text, edLote.text, edCodigoEtiqueta.Text) then
   begin
-    lId := bd.InsertaLectura(FraArticulo.edCodigo.Text,FraArticulo.edNombre.Text, DateToStr(Now()),edLote.Text, stringtofloat(edit1.Text), edUsuario.Text, edCodigoEtiqueta.Text);
+    lId := bd.InsertaLectura(FraArticulo.edCodigo.Text,FraArticulo.edNombre.Text, DateToStr(Now()),edLote.Text, stringtofloat(edPesoManual.Text), edUsuario.Text, edCodigoEtiqueta.Text, stringtoint(edCantidad.Text));
     if ((lId <> 0) and (chkImpresion.Checked)) then
     begin
         CargaLecturas(cbOpciones.ItemIndex, edlote.Text);
@@ -263,7 +289,7 @@ begin
      begin
         Bascula := TaccesoBascula.Create(self, tmPeso,bd.Descarte);
 
-        Bascula.TipoPeso := 'Baxtran';
+        Bascula.TipoPeso := 'Giropes';
         edPeso.Text := '';
 
          // Bascula inactiva
@@ -303,6 +329,7 @@ begin
         btnImprimir.Enabled := True;
         BtnRegularizar.Enabled := True;
         chkImpresion.Enabled := True;
+
      end;
   end;
 end;
@@ -445,13 +472,7 @@ begin
   FraCxGridPesadas.SeleccionaTodo;
 end;
 
-procedure TFrmPrincipal.btnTecladoClick(Sender: TObject);
-begin
-   if Panel6.Visible then
-      Panel6.Visible := False
-   else
-      Panel6.Visible := true;
-end;
+
 
 procedure TFrmPrincipal.BtnUsuarioClick(Sender: TObject);
 begin
@@ -499,7 +520,7 @@ begin
    //Extraemos el nombre del directorio donde obtener la configuración del grid
         lpos := 1;
 
-        lDirectorio := DirectorioSistema(sdAppData)+  '\GestionServidumbre\Principal';
+        lDirectorio := DirectorioSistema(sdAppData)+  '\GestorEtiquetado\Principal';
         lResto := lDirectorio;
         lposAnt := 0;
         while lpos > 0  do
@@ -531,7 +552,7 @@ begin
     // Aplicar los valores al formulario
     Self.Left := LeftPos;
     Self.Top := TopPos;
-    Self.Width := Ancho;
+    Self.Width := 1024;
     Self.Height := Alto;
 
     if SavedWindowState = 2 then //Maximizado
@@ -557,8 +578,8 @@ procedure TFrmPrincipal.CargaSqlEtiquetas(vCodCli:string);
 var
  lCadena : string;
 begin
-    Bd.SqlTextEtiquetas := 'Select ge_id, ge_codart, ge_descripcion, ge_lote,ge_peso,articulo.sal_ingredientes,articulo.SAL_METOPROD, articulo.SAL_ALERGENOS,articulo.SAL_FABRICADOPOR, articulo.SAL_ENVASADOPOR,'+
-                  ' articulo.SAL_DIASCADUCA, articulo.SAL_CONSERVACION, articulo.SAL_ANGRASASTOTAL,articulo.SAL_ANGTSATURADAS, articulo.SAL_ANHIDRACAR, articulo.SAL_ANHCAZUCAR,' +
+    Bd.SqlTextEtiquetas := 'Select top 1 ge_id, ge_codart, ge_descripcion, ge_lote,ge_peso,articulo.sal_ingredientes,articulo.SAL_METOPROD, articulo.SAL_ALERGENOS,articulo.SAL_FABRICADOPOR, articulo.SAL_ENVASADOPOR,'+
+                  ' articulo.SAL_DIASCADUCA, articulo.SAL_CONSERVACION, articulo.SAL_ANGRASASTOTAL,articulo.SAL_ANVALENE, articulo.SAL_ANGTSATURADAS, articulo.SAL_ANHIDRACAR, articulo.SAL_ANHCAZUCAR,' +
                   ' articulo.SAL_ANPROTEINAS, articulo.SAL_ANSAL, Caberegu.param1 Fao, Caberegu.param2 Arte, DATEADD(DAY, articulo.sal_DiasCaduca, GETDATE()) AS FechaCaducidad, '+
                   ' alterna.codalt,';
       if vCodCli <> '' then
@@ -567,13 +588,14 @@ begin
           Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' coalesce(refcli.SAL_METOPROD,'''') metoprodrefcli, coalesce(refcli.SAL_ALERGENOS,'''') alergenosrefcli,coalesce(refcli.SAL_FABRICADOPOR,'''') fabricadoporrefcli, coalesce(refcli.SAL_ENVASADOPOR,'''') envasadoporrefcli,';
           bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' coalesce(refcli.SAL_DIASCADUCA,'''') diascaducarefcli, coalesce(refcli.SAL_CONSERVACION,'''') conservacionrefcli, coalesce(refcli.SAL_ANGRASASTOTAL,0) angrasastotalrefcli,coalesce(refcli.SAL_ANGTSATURADAS,0) angtsaturadasrefcli,';
           bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' coalesce(refcli.SAL_ANHIDRACAR,0) anhidracarrefcli, coalesce(refcli.SAL_ANHCAZUCAR,0) anhcazucarrefcli,';
-          Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' coalesce(refcli.SAL_ANPROTEINAS,0) anproteinasrefcli, coalesce(refcli.SAL_ANSAL,0) ansalrefcli'
+          Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' coalesce(refcli.SAL_ANPROTEINAS,0) anproteinasrefcli, coalesce(refcli.SAL_ANSAL,0) ansalrefcli';
+          Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' ,coalesce(refcli.SAL_Alterna,'''') alternarefcli';
       end
       else
       begin
           Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas +' '''' referencia , '''' descartrefcli, ''''  ingredientesrefcli,''''  metoprodrefcli, ''''  alergenosrefcli, ''''  fabricadoporrefcli, ''''  envasadoporrefcli,'+
                   ' '''' diascaducarefcli, '''' conservacionrefcli, 0  angrasastotalrefcli,0  angtsaturadasrefcli,0 anhidracarrefcli,0 anhcazucarrefcli,' +
-                  ' 0 anproteinasrefcli, 0 ansalrefcli';
+                  ' 0 anproteinasrefcli, 0 ansalrefcli, '''' alternarefcli';
       end;
 
       Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' from ge_pesadas with(nolock) ' +
@@ -584,6 +606,7 @@ begin
       Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' left outer join alterna with(nolock) on alterna.codart = ge_codart '+
                   ' where ge_id = :PId';
   lCadena :=Bd.SqlTextEtiquetas ;
+
 end;
 
 procedure TFrmPrincipal.CbOpcionesChange(Sender: TObject);
@@ -617,10 +640,24 @@ end;
 
 
 
+procedure TFrmPrincipal.EdCantidadClick(Sender: TObject);
+begin
+   EdCantidad.SelectAll;
+     TecladoFlotante := TfrmTeclado.Create(Self);
+   TecladoFlotante.ShowModal;
+    EdCantidad.Text := TecladoFlotante.Texto;
+   TecladoFlotante.Free;
+   EdCantidad.setfocus;
+end;
+
 procedure TFrmPrincipal.edCodigoEtiquetaClick(Sender: TObject);
 begin
    edCodigoEtiqueta.SelectAll;
-  
+    TecladoFlotante := TfrmTeclado.Create(Self);
+   TecladoFlotante.ShowModal;
+    edCodigoEtiqueta.Text := TecladoFlotante.Texto;
+   TecladoFlotante.Free;
+   edLote.setfocus;
 
 end;
 
@@ -654,7 +691,22 @@ begin
   edImpresion.Text := '';
 end;
 
-procedure TFrmPrincipal.Edit1KeyPress(Sender: TObject; var Key: Char);
+procedure TFrmPrincipal.edPesoManualClick(Sender: TObject);
+begin
+   EdPesoManual.SelectAll;
+     TecladoFlotante := TfrmTeclado.Create(Self);
+   TecladoFlotante.ShowModal;
+    EdPesoManual.Text := TecladoFlotante.Texto;
+   TecladoFlotante.Free;
+   EdPesoManual.setfocus;
+end;
+
+procedure TFrmPrincipal.edPesoManualEnter(Sender: TObject);
+begin
+  ShellExecute(0, 'open', PChar('E:\Repositorios\SalazonesSaez\GestorEtiquetado\Win32\Debug\tabtip.exe'), nil, nil, SW_SHOWNORMAL);
+end;
+
+procedure TFrmPrincipal.edPesoManualKeyPress(Sender: TObject; var Key: Char);
 begin
    if Key = '.' then
       Key := ',';
@@ -663,7 +715,11 @@ end;
 procedure TFrmPrincipal.edLoteClick(Sender: TObject);
 begin
     edLote.SelectAll;
-
+      TecladoFlotante := TfrmTeclado.Create(Self);
+   TecladoFlotante.ShowModal;
+    edLote.Text := TecladoFlotante.Texto;
+   TecladoFlotante.Free;
+   edLote.setfocus;
 end;
 
 procedure TFrmPrincipal.edLoteExit(Sender: TObject);
@@ -712,6 +768,8 @@ begin
        if FraCxGridPesadas.dbtvDatos.DataController.DataSource.DataSet.RecordCount > 0 then
             FraCxGridPesadas.guardaGrid('\GestorEtiquetado\Pesadas');
   bd.FinalizaNax;
+   if Assigned(bd) then
+    bd.Destroy;
 end;
 
 procedure TFrmPrincipal.FormCreate(Sender: TObject);
@@ -745,8 +803,8 @@ begin
 
    Show;
   
-   FraArticulo.inicializa(gFicheroIni, edArticulo);
-   FraCliente.inicializa(gFicheroIni, edCliente);
+   FraArticulo.inicializa(gFicheroIni, edArticulo,true);
+   FraCliente.inicializa(gFicheroIni, edCliente,True);
    dtFechaPesada.Date := Now();
    FFormularioCargado:= False;
    if not UsuarioValido then
@@ -770,6 +828,7 @@ begin
    edDescEtiqueta.Text := lDescEtiqueta;
    CargaConfiguracion;
    MostradoMensaje := False;
+   edCantidad.Text := '1';
 end;
 
 procedure TFrmPrincipal.FormKeyDown(Sender: TObject; var Key: Word;
@@ -825,7 +884,11 @@ end;
 procedure TFrmPrincipal.FraArticuloedCodigoClick(Sender: TObject);
 begin
    FraArticulo.edcodigo.selectall;
-
+   TecladoFlotante := TfrmTeclado.Create(Self);
+   TecladoFlotante.ShowModal;
+   FraArticulo.edCodigo.Text := TecladoFlotante.Texto;
+   TecladoFlotante.Free;
+   edCodigoEtiqueta.setfocus;
 
 end;
 
@@ -873,7 +936,11 @@ end;
 procedure TFrmPrincipal.fraClienteedCodigoClick(Sender: TObject);
 begin
    FraCliente.edCodigo.selectall;
-
+   TecladoFlotante := TfrmTeclado.Create(Self);
+   TecladoFlotante.ShowModal;
+   fraCliente.edCodigo.Text := TecladoFlotante.Texto;
+   TecladoFlotante.Free;
+   fraArticulo.edCodigo.setfocus;
 
 end;
 
@@ -923,7 +990,7 @@ begin
         //Extraemos el nombre del directorio donde guardar la configuración del grid
         lpos := 1;
 
-        lDirectorio := DirectorioSistema(sdAppData)+  '\GestionServidumbre\Principal';
+        lDirectorio := DirectorioSistema(sdAppData)+  '\GestorEtiquetado\Principal';
         lResto := lDirectorio;
         lposAnt := 0;
         while lpos > 0  do
@@ -976,7 +1043,7 @@ var
 
 begin
 
-    lId := bd.InsertaLectura(FraArticulo.edCodigo.Text,FraArticulo.edNombre.Text, DateToStr(Now()),edLote.Text,  bascula.Peso, edUsuario.Text, edCodigoEtiqueta.Text);
+    lId := bd.InsertaLectura(FraArticulo.edCodigo.Text,FraArticulo.edNombre.Text, DateToStr(Now()),edLote.Text,  bascula.Peso, edUsuario.Text, edCodigoEtiqueta.Text,1);
     if ((lId <> 0) and (chkImpresion.Checked)) then
     begin
         CargaLecturas(cbOpciones.ItemIndex, edlote.Text);
@@ -999,21 +1066,41 @@ procedure TFrmPrincipal.pmeliminarpesadaClick(Sender: TObject);
 var
   lId: double;
   lIdreg : double;
+  Li: Integer;
 begin
-   lId := TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[0].RecordIndex,'ge_Id');
-   lIdreg := ifnull(TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[0].RecordIndex,'ge_IdRegu'),0);
+    with FraCxGridPesadas.dbtvDatos.Controller do
+    begin
+         // Si no hay registros marcados, salta un aviso y no hace nada.
+        if SelectedRecordCount = 0 then
+        begin
+          MessageDlg('Seleccione una o más pesadas', mtInformation, [mbOK], 0);
+          Screen.Cursor := crDefault;
+          exit;
+        end;
+        if MessageDlg('¿Seguro que desea eliminar las pesadas seleccionadas que no estén regularizadas?' ,mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+           exit;
 
-   if lIdreg <> 0 then
-   begin
-     MessageDlg('No se puede eliminar la pesada porque se encuentra regularizada', mtError, [mbOk], 0);
-     exit;
-   end;
+        try
+            Screen.Cursor := crHourGlass;
+            for lI := 0 to SelectedRecordCount - 1 do
+            begin
 
-   if MessageDlg('¿Eliminar pesada seleccionada?' ,mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-   begin
-     Bd.EliminarPesada(Lid);
-     CargaLecturas(cbOpciones.ItemIndex, edLote.Text);
-   end;
+               lId := TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_Id');
+               lIdreg := ifnull(TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_IdRegu'),0);
+
+               if lIdreg = 0 then
+                  Bd.EliminarPesada(Lid);
+
+
+            end;
+        finally
+
+           CargaLecturas(cbOpciones.ItemIndex, edlote.Text);
+        end;
+        Screen.Cursor := crDefault;
+    end;
+
+
 end;
 
 procedure TFrmPrincipal.tmPesoTimer(Sender: TObject);

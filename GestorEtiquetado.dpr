@@ -14,8 +14,9 @@ uses
   dmImagenesGrande in '..\..\comun\img\dmImagenesGrande.pas' {dmImagesGrande: TDataModule},
   JncFraCxGrid in '..\..\comun\frames\JncFraCxGrid.pas' {fraCxGrid: TFrame},
   FormEtiquetas in 'Form\FormEtiquetas.pas' {FrmEtiquetas},
-  FormTeclado in 'Form\FormTeclado.pas' {FrmTeclado},
-  FormMensaje in 'Form\FormMensaje.pas' {FrmMensaje};
+  FormMensaje in 'Form\FormMensaje.pas' {FrmMensaje},
+  FormTecladoBusqueda in '..\..\comun\frames\FormTecladoBusqueda.pas' {FrmTecladoBusqueda},
+  FormTeclado in 'Form\FormTeclado.pas' {FrmTeclado};
 
 {$R *.res}
 
@@ -25,5 +26,7 @@ begin
   Application.CreateForm(TFrmPrincipal, FrmPrincipal);
   Application.CreateForm(TdmImagesGrande, dmImagesGrande);
   Application.CreateForm(TFrmMensaje, FrmMensaje);
+  Application.CreateForm(TFrmTecladoBusqueda, FrmTecladoBusqueda);
+  Application.CreateForm(TFrmTeclado, FrmTeclado);
   Application.Run;
 end.

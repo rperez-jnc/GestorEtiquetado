@@ -82,14 +82,14 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <VerInfo_Release>1</VerInfo_Release>
+        <VerInfo_Release>2</VerInfo_Release>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
         <Debugger_RunParams>E:\Repositorios\SalazonesSaez\GestorEtiquetado\Docs\config.ini</Debugger_RunParams>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppEnableHighDPI>true</AppEnableHighDPI>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.2.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Gestor de etiquetado V.%s;ProductVersion=1.2.1;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.2.2.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Gestor de etiquetado V.%s;ProductVersion=1.2.2;Comments=</VerInfo_Keys>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -99,10 +99,11 @@
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <VerInfo_Release>1</VerInfo_Release>
+        <Debugger_RunParams>E:\Repositorios\SalazonesSaez\GestorEtiquetado\Docs\config.ini</Debugger_RunParams>
+        <VerInfo_Release>2</VerInfo_Release>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.2.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Gestor etiquetado V.%s;ProductVersion=1.2.1;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.2.2.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Gestor etiquetado V.%s;ProductVersion=1.2.2;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <AppEnableHighDPI>true</AppEnableHighDPI>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -160,12 +161,16 @@
             <Form>FrmEtiquetas</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Form\FormTeclado.pas">
-            <Form>FrmTeclado</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="Form\FormMensaje.pas">
             <Form>FrmMensaje</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\comun\frames\FormTecladoBusqueda.pas">
+            <Form>FrmTecladoBusqueda</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Form\FormTeclado.pas">
+            <Form>FrmTeclado</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <None Include="Docs\config.ini"/>

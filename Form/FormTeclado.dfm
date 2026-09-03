@@ -23,10 +23,6 @@ object FrmTeclado: TFrmTeclado
     GradientEnd = clSilver
     GradientStart = clGray
     Layout = 'Standard'
-    ExplicitLeft = 192
-    ExplicitTop = 72
-    ExplicitWidth = 550
-    ExplicitHeight = 180
   end
   object Panel1: TPanel
     Left = 0
@@ -46,7 +42,7 @@ object FrmTeclado: TFrmTeclado
       Left = 184
       Top = 6
       Width = 153
-      Height = 33
+      Height = 21
       TabOrder = 0
       OnKeyDown = edTextoKeyDown
     end

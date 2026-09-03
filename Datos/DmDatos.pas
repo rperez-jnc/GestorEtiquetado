@@ -86,7 +86,7 @@ type
     procedure EdicionDeArticulo(vCodart:String);
     procedure CargarEtiquetas;
     function BuscarEtiqueta(vCodigo:string;Var vEtiqueta, vDescEtiqueta: string ):string;
-    function InsertaLectura(vCodArt, vDescArt,vFecha, vLote: string; vPeso : double; vUsuario, vEtiqueta:string):double;
+    function InsertaLectura(vCodArt, vDescArt,vFecha, vLote: string; vPeso : double; vUsuario, vEtiqueta:string; vCantidad : integer):double;
     procedure BuscaLecturas(vTipo:integer; vLote:string);
     function BuscarEtiquetaArticulo(vCodArt:string):string ;
     function BuscarEtiquetaCliente(vCodCli, vCodArt:string;Var vEtiqueta:string):boolean;
@@ -104,6 +104,7 @@ type
     function BuscaLineadePeso(vIdReg, vId: double):integer;
     procedure ConsultaDatosEtiquetas(vCodCli,vLote: string; Vid:integer;vTipo:string);
     procedure EliminarPesada(lId:double);
+    procedure CambiarEtiqueta(vId: double;vCodigoEtiqueta:string);
     procedure BuscarTipoArticulo(vCodTipo:string; Var vTipo:string) ;
 
 
@@ -322,6 +323,19 @@ begin
   end;
 end;
 
+procedure TdmdDatos.CambiarEtiqueta(vId: double;vCodigoEtiqueta:string );
+begin
+   with sqlConsulta do
+  begin
+    close;
+    sql.Clear;
+    sql.Add('update ge_pesadas set ge_etiqueta = ' + quotedstr(vCodigoEtiqueta) +' where ge_id = ' + formateafloatsql(vId));
+
+    execsql;
+
+  end;
+end;
+
 procedure TdmdDatos.CancelaRegularizacion;
 begin
   NaxRegularizacion.Cancela;
@@ -374,7 +388,7 @@ begin
        lParametros.Introduce('PCodCli', cuadrasiesnumerico(ParamCodCli,8));
        lParametros.Introduce('PLote', ParamLote);
        lParametros.Introduce('PID', ParamID);
-       Consulta := SqlTextEtiquetas.Replace('Select ', 'Select top 1 ',[rfIgnoreCase]);
+       Consulta := SqlTextEtiquetas;
        Ejecuta(qEtiqueta,Consulta,lParametros);
    end;
    lParametros.Free;
@@ -580,8 +594,8 @@ begin
   Naxlistado.Imprimir();
   Naxlistado.Acabar();  *)
 
-
   ConsultaDatosEtiquetas(vCodCli,vLote,trunc(VId),'Impresion');
+
   frxreport.DataSet := DsEtiqueta;
   frxreport.LoadFromFile(vEtiqueta);
   frxreport.PrepareReport();
@@ -605,37 +619,41 @@ begin
 end;
 
 function TdmdDatos.InsertaLectura(vCodArt, vDescArt, vFecha, vLote: string;
-  vPeso: double; vUsuario, vEtiqueta: string): double;
+  vPeso: double; vUsuario, vEtiqueta: string; vCantidad : integer): double;
 var
   lJSon : string;
+  li : integer;
 begin
-  lJSon := '{"CodArt":"'+ vCodart+'", "DescArt":"'+ vDescArt+'","Lote":"'+ vLote+'","Peso":"'+FormateaFloatSQL(vPeso)+
-           '","FechaPesada":"'+ vFecha+'"}';
-
-
-  with sqlConsulta do
+  for li := 0 to vcantidad - 1  do
   begin
-    close;
-    sql.Clear;
+      lJSon := '{"CodArt":"'+ vCodart+'", "DescArt":"'+ vDescArt+'","Lote":"'+ vLote+'","Peso":"'+FormateaFloatSQL(vPeso)+
+               '","FechaPesada":"'+ vFecha+'"}';
 
-    sql.Add('Insert into ge_pesadas (ge_codart,ge_descripcion, ge_fecha, ge_Json, ge_lote, ge_peso, ge_usuario, ge_etiqueta)');
-    SQL.Add('OUTPUT INSERTED.ge_id');
-    sql.Add(' values (');
-    sql.Add( quotedstr(vCodart));
-    sql.Add(',' + quotedstr(vDescart));
-    sql.Add(',' + quotedstr(vFecha));
-    sql.Add(',' + quotedstr(lJson));
-    sql.Add(',' + quotedstr(vLote));
-    sql.Add(',' + formateafloatsql(vPeso));
-    sql.Add(',' + quotedstr(vUsuario));
-    sql.Add(',' + quotedstr(vEtiqueta));
-    sql.Add(')');
 
-    open;
+      with sqlConsulta do
+      begin
+        close;
+        sql.Clear;
 
-    result := Fields[0].asfloat;
+        sql.Add('Insert into ge_pesadas (ge_codart,ge_descripcion, ge_fecha, ge_Json, ge_lote, ge_peso, ge_usuario, ge_etiqueta)');
+        SQL.Add('OUTPUT INSERTED.ge_id');
+        sql.Add(' values (');
+        sql.Add( quotedstr(vCodart));
+        sql.Add(',' + quotedstr(vDescart));
+        sql.Add(',' + quotedstr(vFecha));
+        sql.Add(',' + quotedstr(lJson));
+        sql.Add(',' + quotedstr(vLote));
+        sql.Add(',' + formateafloatsql(vPeso));
+        sql.Add(',' + quotedstr(vUsuario));
+        sql.Add(',' + quotedstr(vEtiqueta));
+        sql.Add(')');
 
-    GuardaLog('Nueva pesada : Peso - ' + floattostr(vPeso) );
+        open;
+
+        result := Fields[0].asfloat;
+
+        GuardaLog('Nueva pesada : Peso - ' + floattostr(vPeso) );
+      end;
   end;
 end;
 

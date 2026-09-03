@@ -74,43 +74,80 @@ end;
 
 // Calcula el peso con la cadena recibida.
 function TaccesoBascula.calculaPeso(vRespuestaPeso: ansiString): Double;
+var
+  vPesoEntero: Integer;
+  vCadenaPeso: String;
 begin
 
   // Los datos son correctos si la cadena comienza por '990'
   if ((AnsiLeftStr(string(vRespuestaPeso), 3) = '990') and (TipoPeso = 'Peso')) then
   begin
-    // El peso se encuentra entre la posición 4-9
     result := strTofloat(AnsiMidStr(string(vRespuestaPeso), 4, 5)) / 1000;
     exit;
   end;
 
   if ((AnsiLeftStr(string(vRespuestaPeso), 3) = '990') and (TipoPeso = 'Minerva')) then
   begin
-    // El peso se encuentra entre la posición 4-9
     result := strTofloat(AnsiMidStr(string(vRespuestaPeso), 4, 5)) / 1000;
     exit;
   end;
 
   if ((AnsiLeftStr(string(vRespuestaPeso), 3) = '991') and (TipoPeso = 'Minerva')) then
   begin
-     result := Peso;
-     exit;
+    result := Peso;
+    exit;
   end;
+
   if TipoPeso = 'Baxtran' then
   begin
-     //En la balanza Baxtran hay que configurar en los parámetros como en programacion de Balanzas de ATC
-       result := Formateafloat(AnsiMidStr(string(vRespuestaPeso),1,7));
-
-      exit;
+    result := Formateafloat(AnsiMidStr(string(vRespuestaPeso), 1, 7));
+    exit;
   end;
 
+  if TipoPeso = 'Giropes' then
+  begin
+    result := -1;
+
+    // Trama EPSA mínima:
+    // STX + estado + signo + 2 espacios + 5 dígitos + CR + LF
+    if Length(vRespuestaPeso) < 10 then
+      exit;
+
+    // Primer byte debe ser STX
+    if vRespuestaPeso[1] <> AnsiChar(#2) then
+      exit;
+
+    // '!' = peso inestable o error
+    if vRespuestaPeso[2] = '!' then
+      exit;
+
+    // 'I' = peso cero
+    if vRespuestaPeso[2] = 'I' then
+    begin
+      result := 0;
+      exit;
+    end;
+
+    // Peso en posiciones 6..10
+    vCadenaPeso := AnsiMidStr(string(vRespuestaPeso), 6, 5);
+
+    if not TryStrToInt(Trim(vCadenaPeso), vPesoEntero) then
+      exit;
+
+    // GI400 de la foto: 3 decimales
+    result := vPesoEntero / 1000;
+
+    // Signo negativo
+    if vRespuestaPeso[3] = '-' then
+      result := -result;
+
+    exit;
+  end;
 
   if TipoPeso = 'Visor' then
-      result := formateafloat(AnsiMidStr(string(vRespuestaPeso),1,7))
+    result := Formateafloat(AnsiMidStr(string(vRespuestaPeso), 1, 7))
   else
-       result := -1;
-
-
+    result := -1;
 end;
 
 // Comprueba la lectura recibida para calcular el peso correcto
