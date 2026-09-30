@@ -68,6 +68,7 @@ type
     FParamId: integer;
     FParamLote: string;
     FEtiqueta: string;
+    FImpCajas: string;
     { Private declarations }
   public
     { Public declarations }
@@ -129,6 +130,7 @@ type
     property ParamLote: string read FParamLote write FParamLote;
     property ParamId:integer read FParamId write FParamId;
     property Etiqueta: string read FEtiqueta write FEtiqueta;
+    property ImpCajas: string read FImpCajas write FImpCajas;
   end;
 
 var
@@ -185,6 +187,8 @@ begin
        sql.Add('and coalesce(ge_idregu, 0) = 0');
        sql.Add('and coalesce(ge_impresa,''F'') = ''F''');
     end;
+
+    sql.Add('ORDER BY ge_id DESC');
     lcadena := sql.text;
     open;
   end;
@@ -279,8 +283,8 @@ begin
      sql.Clear;
 
      sql.Add('Select coalesce(ge_etiqueta,'''') Etiqueta from ge_etiquetascliente with(nolock)');
-     sql.Add('where coalesce(ge_articulo,'''') = ' + quotedstr(vCodArt));
-     sql.Add('and coalesce(ge_cliente,'''') = ' + quotedstr(vCodCli));
+     sql.Add('where coalesce(ge_articulo,'''') = ' + quotedstr(cuadrasiesnumerico(vCodArt,15)));
+     sql.Add('and coalesce(ge_cliente,'''') = ' + quotedstr(cuadrasiesnumerico(vCodCli,8)));
 
      open;
 
@@ -288,6 +292,24 @@ begin
      begin
        vEtiqueta := fieldbyname('Etiqueta').AsString;
        result := true;
+     end
+     else
+     begin
+
+         close;
+         sql.Clear;
+
+         sql.Add('Select coalesce(ge_etiqueta,'''') Etiqueta from ge_etiquetascliente with(nolock)');
+         sql.Add('where coalesce(ge_cliente,'''') = ' + quotedstr(cuadrasiesnumerico(vCodCli,8)));
+
+         open;
+
+         if recordcount > 0 then
+         begin
+           vEtiqueta := fieldbyname('Etiqueta').AsString;
+           result := true;
+         end;
+
      end;
    end;
 end;
@@ -673,6 +695,7 @@ begin
   ParamId := Stringtoint(vIni.ReadString('Opciones','ParamId','0') );
   ImpresoraEtiArt := vIni.ReadString('Opciones','ImpresoraEtiArt','');
   Etiqueta := vIni.ReadString('Opciones','Etiqueta','');
+  ImpCajas := vIni.ReadString('Opciones','ImpCajas','T');
 
 end;
 

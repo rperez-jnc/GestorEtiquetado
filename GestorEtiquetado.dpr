@@ -16,7 +16,11 @@ uses
   FormEtiquetas in 'Form\FormEtiquetas.pas' {FrmEtiquetas},
   FormMensaje in 'Form\FormMensaje.pas' {FrmMensaje},
   FormTecladoBusqueda in '..\..\comun\frames\FormTecladoBusqueda.pas' {FrmTecladoBusqueda},
-  FormTeclado in 'Form\FormTeclado.pas' {FrmTeclado};
+  FormTeclado in 'Form\FormTeclado.pas' {FrmTeclado},
+  uFrameTecladoVirtual in 'Form\uFrameTecladoVirtual.pas',
+  FormLotesDisponibles in 'Form\FormLotesDisponibles.pas',
+  JncBusqueda in 'Form\JncBusqueda.pas' {frmSeleccion},
+  uEstiloBusquedaTablet in 'Form\uEstiloBusquedaTablet.pas';
 
 {$R *.res}
 
@@ -26,7 +30,5 @@ begin
   Application.CreateForm(TFrmPrincipal, FrmPrincipal);
   Application.CreateForm(TdmImagesGrande, dmImagesGrande);
   Application.CreateForm(TFrmMensaje, FrmMensaje);
-  Application.CreateForm(TFrmTecladoBusqueda, FrmTecladoBusqueda);
-  Application.CreateForm(TFrmTeclado, FrmTeclado);
   Application.Run;
 end.

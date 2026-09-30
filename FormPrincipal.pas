@@ -8,7 +8,7 @@ uses
   JncMaestro, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Buttons, dmImagenesGrande,
   JncFraCxGrid, DmBascula, JvExStdCtrls, JvEdit, JvValidateEdit, BasculaModelo, FormEtiquetas,
   System.Actions, Vcl.ActnList, JncGridDx, frxClass, frxBarcode, Vcl.Menus,FormTeclado,
-  Vcl.Touch.Keyboard, IniFiles, FormMensaje, ShellAPI;
+  Vcl.Touch.Keyboard, IniFiles, FormMensaje, ShellAPI,uFrameTecladoVirtual,FormLotesDisponibles;
 
 type
   TFrmPrincipal = class(TForm)
@@ -62,6 +62,8 @@ type
     acCambiaretiqueta: TMenuItem;
     EdCantidad: TEdit;
     Label3: TLabel;
+    btnImprimirCajas: TBitBtn;
+    btnEliminarPesadas: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure btnIniciarClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -103,14 +105,25 @@ type
     procedure edPesoManualClick(Sender: TObject);
     procedure acCambiaretiquetaClick(Sender: TObject);
     procedure EdCantidadClick(Sender: TObject);
+    procedure btnImprimirCajasClick(Sender: TObject);
+
   private
     FFIcheroIni: TFileName;
     FBd: TdmdDatos;
     FIdPesada: integer;
     FBascula: TaccesoBascula;
     FFormularioCargado: Boolean;
+     FTeclado: TFrameTecladoVirtual;
+     FBuscandoLote: Boolean;
     function getPeso: Double;
+   procedure AvanzarSiguienteControl(AControl: TWinControl);
 
+
+   function BuscarArticuloF12(Sender: TObject): Boolean;
+   function BuscarClienteF12(Sender: TObject): Boolean;
+   function BuscarLoteDisponible: Boolean;
+   procedure FinalizarBusquedaF12(AControl: TWinControl);
+   procedure CancelarBusquedaF12(AControl: TWinControl);
     { Private declarations }
   public
     { Public declarations }
@@ -120,9 +133,11 @@ type
     procedure activaTimerPeso(vEstado: Boolean);
     procedure compruebaPeso;
     procedure GuardarPesada;
-    Procedure BuscaEtiqueta;
+    function BuscaEtiqueta: Boolean;
     Procedure CargaLecturas(vTipo:integer; vlote:string);
     procedure CargaSqlEtiquetas(vCodCli:string);
+    procedure CargaSqlEtiquetasCaja(vCodCli: string; vPesoTotal: Double);
+
 
 
     property Bd:TdmdDatos read FBd write FBd;
@@ -180,6 +195,208 @@ begin
 end;
 
 
+procedure TFrmPrincipal.AvanzarSiguienteControl(AControl: TWinControl);
+begin
+  if not Assigned(AControl) then
+    Exit;
+
+  // El control de origen debe tener el foco para que WM_NEXTDLGCTL
+  // avance desde el campo correcto.
+  if AControl.CanFocus then
+    AControl.SetFocus;
+
+  // Avanza realmente al siguiente control segun el TabOrder.
+  SendMessage(Self.Handle, WM_NEXTDLGCTL, 0, 0);
+end;
+
+procedure TFrmPrincipal.btnImprimirCajasClick(Sender: TObject);
+var
+  lI: Integer;
+
+  lCodArt: string;
+  lEtiqueta: string;
+  lFormato: string;
+  lLote: string;
+
+  lPeso: Double;
+  lPesoTotal: Double;
+
+  lId: Double;
+  lIdPrimera: Double;
+
+begin
+  with FraCxGridPesadas.dbtvDatos.Controller do
+  begin
+
+    { ---------------------------------------------------------
+      COMPROBAR SELECCION
+      --------------------------------------------------------- }
+
+    if SelectedRecordCount = 0 then
+    begin
+      MessageDlg(
+        'Seleccione una o más pesadas',
+        mtInformation,
+        [mbOK],
+        0
+      );
+
+      Exit;
+    end;
+
+
+    Screen.Cursor := crHourGlass;
+
+    bd.JvmLineasMarcar.Close;
+    bd.JvmLineasMarcar.Open;
+
+    try
+
+      lPesoTotal := 0;
+
+      lIdPrimera := 0;
+      lCodArt := '';
+      lEtiqueta := '';
+      lFormato := '';
+      lLote := '';
+
+
+      { ---------------------------------------------------------
+        RECORREMOS TODAS LAS LINEAS SELECCIONADAS
+
+        - Sumamos pesos.
+        - Guardamos todos los IDs para marcarlos.
+        - De la primera línea obtenemos los datos de impresión.
+        --------------------------------------------------------- }
+
+      for lI := 0 to SelectedRecordCount - 1 do
+      begin
+
+        lPeso :=
+          TJncGridDx.BuscaValor(
+            FraCxGridPesadas.dbtvDatos,
+            SelectedRecords[lI].RecordIndex,
+            'ge_Peso'
+          );
+
+        lId :=
+          TJncGridDx.BuscaValor(
+            FraCxGridPesadas.dbtvDatos,
+            SelectedRecords[lI].RecordIndex,
+            'ge_Id'
+          );
+
+
+        { Sumar peso }
+
+        lPesoTotal :=
+          lPesoTotal + lPeso;
+
+
+        { Guardamos los datos de la PRIMERA línea }
+
+        if lI = 0 then
+        begin
+
+          lIdPrimera := lId;
+
+          lCodArt :=
+            TJncGridDx.BuscaValor(
+              FraCxGridPesadas.dbtvDatos,
+              SelectedRecords[lI].RecordIndex,
+              'ge_CodArt'
+            );
+
+          lEtiqueta :=
+            TJncGridDx.BuscaValor(
+              FraCxGridPesadas.dbtvDatos,
+              SelectedRecords[lI].RecordIndex,
+              'ge_Etiqueta'
+            );
+
+          lLote :=
+            TJncGridDx.BuscaValor(
+              FraCxGridPesadas.dbtvDatos,
+              SelectedRecords[lI].RecordIndex,
+              'ge_Lote'
+            );
+
+        end;
+
+
+        { Guardamos todas las líneas seleccionadas }
+
+        bd.JvmLineasMarcar.AppendRecord(
+          [lId]
+        );
+
+      end;
+
+
+      { ---------------------------------------------------------
+        FORMATO DE LA PRIMERA LINEA
+        --------------------------------------------------------- }
+
+      lFormato :=
+        Bd.BuscarFormatoEtiqueta(
+          lEtiqueta
+        );
+
+
+      { ---------------------------------------------------------
+        PREPARAMOS SQL DE ETIQUETA
+
+        Los datos se obtienen de la primera línea,
+        pero GE_PESO será sustituido por la suma.
+        --------------------------------------------------------- }
+
+      CargaSqlEtiquetasCaja(
+        FraCliente.edCodigo.Text,
+        lPesoTotal
+      );
+
+
+      { ---------------------------------------------------------
+        IMPRIMIR
+
+        IMPORTANTE:
+        Solo llamamos UNA VEZ a ImprimirEtiqueta.
+        --------------------------------------------------------- }
+
+      Bd.ImprimirEtiqueta(
+        lCodArt,
+        lFormato,
+        FraCliente.edCodigo.Text,
+        lLote,
+        lIdPrimera
+      );
+
+
+      { ---------------------------------------------------------
+        MARCAMOS TODAS LAS LINEAS
+        --------------------------------------------------------- }
+
+      bd.MarcarLineasImp;
+
+
+    finally
+
+      Screen.Cursor := crDefault;
+
+      bd.JvmLineasMarcar.Close;
+      bd.JvmLineasMarcar.Open;
+
+      CargaLecturas(
+        cbOpciones.ItemIndex,
+        edLote.Text
+      );
+
+    end;
+
+  end;
+
+end;
+
 procedure TFrmPrincipal.btnBuscarEtiquetasClick(Sender: TObject);
 begin
   BuscaEtiqueta;
@@ -207,6 +424,7 @@ begin
    frxreport.DataSet := Bd.DsEtiqueta;
    frxReport.DesignReport();
 end;
+
 
 procedure TFrmPrincipal.btnGuardarPesadaClick(Sender: TObject);
 var
@@ -484,21 +702,114 @@ begin
    end;
 end;
 
-procedure TFrmPrincipal.BuscaEtiqueta;
+function TFrmPrincipal.BuscaEtiqueta: Boolean;
 var
-  lfrmEtiquetas : TfrmEtiquetas;
+  lFrmEtiquetas: TfrmEtiquetas;
 begin
-  lfrmEtiquetas := TfrmEtiquetas.Create(Self);
-  lfrmEtiquetas.Inicializa(Bd);
-  lfrmEtiquetas.ShowModal;
+  Result := False;
 
-  EdIdEtiqueta.text :=  inttostr(lfrmEtiquetas.IdEtiqueta);
-  EdCodigoEtiqueta.Text := lFrmEtiquetas.Codigo;
-  EdEtiqueta.Text := lFrmEtiquetas.Etiqueta;
-  edDescEtiqueta.Text := lFrmEtiquetas.Descripcion;
-  lFrmEtiquetas.Free;
+  lFrmEtiquetas := TfrmEtiquetas.Create(Self);
+  try
+
+    lFrmEtiquetas.Inicializa(Bd);
+
+    lFrmEtiquetas.ShowModal;
+
+    { El formulario es nuevo en cada busqueda.
+      Si Codigo esta vacio, interpretamos que no
+      se ha seleccionado ninguna etiqueta. }
+
+    if Trim(lFrmEtiquetas.Codigo) = '' then
+      Exit;
+
+    EdIdEtiqueta.Text :=
+      IntToStr(lFrmEtiquetas.IdEtiqueta);
+
+    EdCodigoEtiqueta.Text :=
+      lFrmEtiquetas.Codigo;
+
+    EdEtiqueta.Text :=
+      lFrmEtiquetas.Etiqueta;
+
+    edDescEtiqueta.Text :=
+      lFrmEtiquetas.Descripcion;
+
+    Result := True;
+
+  finally
+    lFrmEtiquetas.Free;
+  end;
+end;
+function TFrmPrincipal.BuscarArticuloF12(Sender: TObject): Boolean;
+begin
+  Result := False;
+
+  FraArticulo.Busqueda.ModalResult := mrNone;
+
+  FraArticulo.acBusquedaExecute(Sender);
+
+  Result :=
+    FraArticulo.Busqueda.ModalResult = mrOk;
 end;
 
+function TFrmPrincipal.BuscarClienteF12(Sender: TObject): Boolean;
+begin
+  Result := False;
+
+  FraCliente.Busqueda.ModalResult := mrNone;
+
+  FraCliente.acBusquedaExecute(Sender);
+
+  Result :=
+    FraCliente.Busqueda.ModalResult = mrOk;
+end;
+
+function TFrmPrincipal.BuscarLoteDisponible: Boolean;
+var
+  lLote: string;
+begin
+  Result := False;
+
+  if Trim(FraArticulo.edCodigo.Text) = '' then
+  begin
+    MessageDlg(
+      'Seleccione primero un articulo.',
+      mtInformation,
+      [mbOK],
+      0
+    );
+
+    FraArticulo.edCodigo.SetFocus;
+    Exit;
+  end;
+
+  FBuscandoLote := True;
+
+  try
+
+    if TFrmLotesDisponibles.SeleccionarLote(
+         Self,
+         Bd.Conexion,
+         Trim(FraArticulo.edCodigo.Text),
+         lLote
+       ) then
+    begin
+
+      edLote.Text := lLote;
+
+      edLote.SelStart :=
+        Length(edLote.Text);
+
+      edLote.SelLength := 0;
+
+      Result := True;
+
+    end;
+
+  finally
+    FBuscandoLote := False;
+  end;
+end;
 procedure TFrmPrincipal.Button1Click(Sender: TObject);
 begin
   if edlote.Text <> '' then
@@ -570,8 +881,12 @@ procedure TFrmPrincipal.CargaLecturas(vTipo:integer; vLote:string);
 begin
   Bd.BuscaLecturas(vTipo, vLote);
   FraCxGridPesadas.cargaDatosGrid(Bd.DsLecturas,'\GestorEtiquetado\Pesadas');
+  FraCxGridPesadas.dbtvDatos.OptionsCustomize.ColumnSorting := False;
   TJncGridDx.PonerGridNoEditable(FraCxGridPesadas.dbtvDatos);
   TJncGridDx.OcultarColumnaNombre(FraCxGridPesadas.dbtvDatos,'ge_Id');
+  TJncGridDx.OcultarColumnaNombre(FraCxGridPesadas.dbtvDatos,'ge_Usuario');
+  TJncGridDx.OcultarColumnaNombre(FraCxGridPesadas.dbtvDatos,'ge_Json');
+
 end;
 
 procedure TFrmPrincipal.CargaSqlEtiquetas(vCodCli:string);
@@ -609,6 +924,46 @@ begin
 
 end;
 
+procedure TFrmPrincipal.CargaSqlEtiquetasCaja(vCodCli: string;
+  vPesoTotal: Double);
+var
+  FS: TFormatSettings;
+  lPesoSQL: string;
+begin
+  // Cargamos exactamente la misma SQL que para una etiqueta normal
+  CargaSqlEtiquetas(vCodCli);
+
+  // SQL Server necesita punto como separador decimal
+  FS := TFormatSettings.Create;
+
+  lPesoSQL := FloatToStr(
+    vPesoTotal,
+    FS
+  );
+
+  if FS.DecimalSeparator <> '.' then
+  begin
+    lPesoSQL := StringReplace(
+      lPesoSQL,
+      FS.DecimalSeparator,
+      '.',
+      [rfReplaceAll]
+    );
+  end;
+
+  // En lugar del peso de GE_PESADAS,
+  // enviamos a la etiqueta el peso total calculado.
+  Bd.SqlTextEtiquetas :=
+    StringReplace(
+      Bd.SqlTextEtiquetas,
+      'ge_lote,ge_peso,',
+      'ge_lote,CAST(' +
+        lPesoSQL +
+        ' AS FLOAT) AS ge_peso,',
+      [rfReplaceAll, rfIgnoreCase]
+    );
+end;
+
 procedure TFrmPrincipal.CbOpcionesChange(Sender: TObject);
 begin
    if edlote.Text <> '' then
@@ -643,33 +998,43 @@ end;
 procedure TFrmPrincipal.EdCantidadClick(Sender: TObject);
 begin
    EdCantidad.SelectAll;
-     TecladoFlotante := TfrmTeclado.Create(Self);
+
+   if Assigned(FTeclado) then
+   begin
+     FTeclado.AutoMostrar := True;
+     FTeclado.MostrarPara(EdCantidad, ttNumerico);
+   end;
+  {   TecladoFlotante := TfrmTeclado.Create(Self);
    TecladoFlotante.ShowModal;
     EdCantidad.Text := TecladoFlotante.Texto;
    TecladoFlotante.Free;
-   EdCantidad.setfocus;
+   EdCantidad.setfocus;  }
 end;
 
 procedure TFrmPrincipal.edCodigoEtiquetaClick(Sender: TObject);
 begin
    edCodigoEtiqueta.SelectAll;
-    TecladoFlotante := TfrmTeclado.Create(Self);
+
+   if Assigned(FTeclado) then
+   begin
+     FTeclado.AutoMostrar := True;
+     FTeclado.MostrarPara(edCodigoEtiqueta, ttAlfanumerico);
+   end;
+   { TecladoFlotante := TfrmTeclado.Create(Self);
    TecladoFlotante.ShowModal;
     edCodigoEtiqueta.Text := TecladoFlotante.Texto;
    TecladoFlotante.Free;
-   edLote.setfocus;
+   edLote.setfocus;   }
 
 end;
 
 procedure TFrmPrincipal.edCodigoEtiquetaExit(Sender: TObject);
 var
   lEtiqueta, lDescripcion:string;
-
 begin
    edCodigoEtiqueta.Text := Bd.BuscarEtiqueta(edCodigoEtiqueta.Text, lEtiqueta, lDescripcion );
    edEtiqueta.text := lEtiqueta;
    edDescEtiqueta.text := lDescripcion;
-
 end;
 
 procedure TFrmPrincipal.edImpresionClick(Sender: TObject);
@@ -694,16 +1059,22 @@ end;
 procedure TFrmPrincipal.edPesoManualClick(Sender: TObject);
 begin
    EdPesoManual.SelectAll;
-     TecladoFlotante := TfrmTeclado.Create(Self);
+
+   if Assigned(FTeclado) then
+   begin
+     FTeclado.AutoMostrar := True;
+     FTeclado.MostrarPara(EdPesoManual, ttNumerico);
+   end;
+   {  TecladoFlotante := TfrmTeclado.Create(Self);
    TecladoFlotante.ShowModal;
     EdPesoManual.Text := TecladoFlotante.Texto;
    TecladoFlotante.Free;
-   EdPesoManual.setfocus;
+   EdPesoManual.setfocus;   }
 end;
 
 procedure TFrmPrincipal.edPesoManualEnter(Sender: TObject);
 begin
-  ShellExecute(0, 'open', PChar('E:\Repositorios\SalazonesSaez\GestorEtiquetado\Win32\Debug\tabtip.exe'), nil, nil, SW_SHOWNORMAL);
+//  ShellExecute(0, 'open', PChar('E:\Repositorios\SalazonesSaez\GestorEtiquetado\Win32\Debug\tabtip.exe'), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TFrmPrincipal.edPesoManualKeyPress(Sender: TObject; var Key: Char);
@@ -715,11 +1086,17 @@ end;
 procedure TFrmPrincipal.edLoteClick(Sender: TObject);
 begin
     edLote.SelectAll;
-      TecladoFlotante := TfrmTeclado.Create(Self);
+
+    if Assigned(FTeclado) then
+    begin
+      FTeclado.AutoMostrar := True;
+      FTeclado.MostrarPara(edLote, ttAlfanumerico);
+    end;
+ {     TecladoFlotante := TfrmTeclado.Create(Self);
    TecladoFlotante.ShowModal;
     edLote.Text := TecladoFlotante.Texto;
    TecladoFlotante.Free;
-   edLote.setfocus;
+   edLote.setfocus;   }
 end;
 
 procedure TFrmPrincipal.edLoteExit(Sender: TObject);
@@ -729,11 +1106,16 @@ var
   lMensaje : TfrmMensaje;
 begin
 
+  // Si estamos dentro de la busqueda F12, el lote pierde el foco
+  // porque se abre una ventana modal. NO debemos validarlo.
+    if FBuscandoLote then
+    Exit;
 
      //Vamos a mostra un aviso con el codigo de producto que es ese lote
      if edLote.Text <> '' then
      begin
         lMensaje := TFrmMensaje.Create(Self);
+        try
         lCodTipo := copy(edlote.Text,1,2);
         Bd.BuscarTipoArticulo(lCodTipo,lTipo);
         if ltipo <> '' then
@@ -742,8 +1124,11 @@ begin
         else
            lMensaje.Inicializa('El lote no pertenece a ningún tipo de articulo');
 
-        lMensaje.ShowModal;
-        lMensaje.Free;
+        finally
+          lMensaje.ShowModal;
+          lMensaje.Free;
+
+        end;
 
      end;
 
@@ -759,6 +1144,59 @@ begin
     edLoteExit(Sender);
     MostradoMensaje := true;
   end;
+end;
+
+procedure TFrmPrincipal.CancelarBusquedaF12(
+  AControl: TWinControl
+);
+begin
+  if not Assigned(AControl) then
+    Exit;
+
+  { Al cancelar F12 queremos volver al mismo campo,
+    pero con el teclado oculto. }
+  if Assigned(FTeclado) then
+  begin
+    FTeclado.AutoMostrar := False;
+    FTeclado.OcultarTeclado;
+    FTeclado.ControlActivo := nil;
+  end;
+
+  if AControl.CanFocus then
+    AControl.SetFocus;
+end;
+
+procedure TFrmPrincipal.FinalizarBusquedaF12(
+  AControl: TWinControl
+);
+begin
+  if not Assigned(AControl) then
+    Exit;
+
+  { Cerramos el teclado y eliminamos el control activo
+    para impedir que el valor seleccionado vuelva a
+    aparecer en el visor. }
+
+  if Assigned(FTeclado) then
+  begin
+    // Tras una seleccion F12 no queremos que el temporizador
+    // vuelva a mostrar el teclado al cambiar el foco. Se reactivara
+    // cuando el usuario toque de nuevo un campo editable.
+    FTeclado.AutoMostrar := False;
+    FTeclado.OcultarTeclado;
+    FTeclado.ControlActivo := nil;
+  end;
+
+  { Partimos exactamente del Edit que realizó la búsqueda. }
+
+  if AControl.CanFocus then
+    AControl.SetFocus;
+
+  { Provoca OnExit y avanza según TabOrder. }
+
+  AvanzarSiguienteControl(
+    AControl
+  );
 end;
 
 procedure TFrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -801,8 +1239,48 @@ begin
 
     Bd.InicializaNax;
 
+   // 1. Crear el componente
+  FTeclado := TFrameTecladoVirtual.Create(Self);
+
+  // 2. Asignarle primero un Parent
+  FTeclado.Parent := Self;
+
+  // 3. Configurar posicion y tamaño
+  FTeclado.Align := alBottom;
+  // Un poco más alto porque ahora tenemos el visor
+  FTeclado.Height := 410;
+
+  // 4. Configuracion
+  FTeclado.TamanoFuente := 18;
+  FTeclado.EspacioEntreTeclas := 5;
+
+  FTeclado.DeteccionAutomatica := True;
+  FTeclado.AutoMostrar := True;
+  FTeclado.AutoOcultar := True;
+
+  FTeclado.AjustarVistaAutomaticamente := True;
+  FTeclado.RestaurarScrollAlOcultar := True;
+  FTeclado.MargenVisibilidad := 20;
+
+  FTeclado.PermitirNegativos := True;
+  FTeclado.EnterSiguienteControl := True;
+  FTeclado.EnterSaltoLineaMemo := True;
+
+  FTeclado.MostrarTeclasFuncion := True;
+
+  // NUEVO
+  FTeclado.MostrarVisorTexto := True;
+  FTeclado.UsarBufferTexto := True;
+  FTeclado.AlturaVisorTexto := 60;
+  FTeclado.RegistrarNumerico(EdCantidad);
+  FTeclado.RegistrarNumerico(edPesoManual);
+
+   // 5. MUY IMPORTANTE:
+  // crear las teclas y activar la deteccion SOLO ahora
+  FTeclado.Inicializar;
+
    Show;
-  
+
    FraArticulo.inicializa(gFicheroIni, edArticulo,true);
    FraCliente.inicializa(gFicheroIni, edCliente,True);
    dtFechaPesada.Date := Now();
@@ -831,29 +1309,96 @@ begin
    edCantidad.Text := '1';
 end;
 
-procedure TFrmPrincipal.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TFrmPrincipal.FormKeyDown(
+  Sender: TObject;
+  var Key: Word;
+  Shift: TShiftState
+);
 begin
 
   if Key = VK_F11 then
   begin
-    Key := 0; // consumir la tecla
+    Key := 0;
+
     if FraArticulo.edCodigo.Focused then
-        bd.EdicionDeArticulo(FraArticulo.edCodigo.Text);
+      Bd.EdicionDeArticulo(
+        FraArticulo.edCodigo.Text
+      );
   end
-  else
-  if Key = VK_F12 then
+
+  else if Key = VK_F12 then
   begin
-    Key := 0; // consumir la tecla
+    Key := 0;
+
+
+    { ARTICULO }
+
     if FraArticulo.edCodigo.Focused then
-        FraArticulo.acBusquedaExecute(Sender)
-    else
-    if FraCliente.edCodigo.Focused then
-        FraCliente.acBusquedaExecute(Sender)
-    else
-    if edCodigoEtiqueta.Focused then
-         AcBuscaEtiquetaExecute(Sender);
-  end
+    begin
+
+      if BuscarArticuloF12(Sender) then
+        FinalizarBusquedaF12(
+          FraArticulo.edCodigo
+        )
+      else
+        CancelarBusquedaF12(
+          FraArticulo.edCodigo
+        );
+
+    end
+
+
+    { CLIENTE }
+
+    else if FraCliente.edCodigo.Focused then
+    begin
+
+      if BuscarClienteF12(Sender) then
+        FinalizarBusquedaF12(
+          FraCliente.edCodigo
+        )
+      else
+        CancelarBusquedaF12(
+          FraCliente.edCodigo
+        );
+
+    end
+
+
+    { LOTE }
+
+    else if edLote.Focused then
+    begin
+
+      if BuscarLoteDisponible then
+        FinalizarBusquedaF12(
+          edLote
+        )
+      else
+        CancelarBusquedaF12(
+          edLote
+        );
+
+    end
+
+
+    { ETIQUETA }
+
+    else if edCodigoEtiqueta.Focused then
+    begin
+
+      if BuscaEtiqueta then
+        FinalizarBusquedaF12(
+          edCodigoEtiqueta
+        )
+      else
+        CancelarBusquedaF12(
+          edCodigoEtiqueta
+        );
+
+    end;
+
+  end;
 
 end;
 
@@ -884,11 +1429,17 @@ end;
 procedure TFrmPrincipal.FraArticuloedCodigoClick(Sender: TObject);
 begin
    FraArticulo.edcodigo.selectall;
-   TecladoFlotante := TfrmTeclado.Create(Self);
+
+   if Assigned(FTeclado) then
+   begin
+     FTeclado.AutoMostrar := True;
+     FTeclado.MostrarPara(FraArticulo.edCodigo, ttAlfanumerico);
+   end;
+ {  TecladoFlotante := TfrmTeclado.Create(Self);
    TecladoFlotante.ShowModal;
    FraArticulo.edCodigo.Text := TecladoFlotante.Texto;
    TecladoFlotante.Free;
-   edCodigoEtiqueta.setfocus;
+   edCodigoEtiqueta.setfocus;  }
 
 end;
 
@@ -935,12 +1486,14 @@ end;
 
 procedure TFrmPrincipal.fraClienteedCodigoClick(Sender: TObject);
 begin
+
    FraCliente.edCodigo.selectall;
-   TecladoFlotante := TfrmTeclado.Create(Self);
-   TecladoFlotante.ShowModal;
-   fraCliente.edCodigo.Text := TecladoFlotante.Texto;
-   TecladoFlotante.Free;
-   fraArticulo.edCodigo.setfocus;
+
+   if Assigned(FTeclado) then
+   begin
+     FTeclado.AutoMostrar := True;
+     FTeclado.MostrarPara(FraCliente.edCodigo, ttAlfanumerico);
+   end;
 
 end;
 
