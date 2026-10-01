@@ -619,12 +619,17 @@ begin
   ConsultaDatosEtiquetas(vCodCli,vLote,trunc(VId),'Impresion');
 
   frxreport.DataSet := DsEtiqueta;
+
   frxreport.LoadFromFile(vEtiqueta);
+
   frxreport.PrepareReport();
+
   frxreport.PrintOptions.ShowDialog := False;
   frxReport.PrintOptions.Copies := 1;
   frxReport.PrintOptions.Printer := ImpresoraEtiArt;
+
   frxreport.Print;
+
 
 end;
 

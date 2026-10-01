@@ -28,7 +28,6 @@
     Align = alTop
     Anchors = [akTop, akRight]
     TabOrder = 0
-    ExplicitWidth = 936
     DesignSize = (
       931
       166)
@@ -107,7 +106,7 @@
       TabOrder = 1
       ExplicitLeft = 103
       ExplicitTop = 63
-      ExplicitWidth = 822
+      ExplicitWidth = 817
       ExplicitHeight = 41
       inherited Bttmaestro: TBitBtn [0]
         Left = 103
@@ -161,9 +160,8 @@
       Font.Name = 'Tahoma'
       Font.Style = []
       ParentFont = False
+      ReadOnly = True
       TabOrder = 2
-      OnClick = edCodigoEtiquetaClick
-      OnExit = edCodigoEtiquetaExit
     end
     object edEtiqueta: TEdit
       Left = 209
@@ -222,7 +220,7 @@
       TabOrder = 0
       ExplicitLeft = 103
       ExplicitTop = 19
-      ExplicitWidth = 819
+      ExplicitWidth = 814
       ExplicitHeight = 41
       inherited Bttmaestro: TBitBtn [0]
         Left = 103
@@ -318,7 +316,6 @@
     Height = 64
     Align = alTop
     TabOrder = 1
-    ExplicitWidth = 936
     object Label1: TLabel
       Left = 10
       Top = 20
@@ -462,7 +459,6 @@
     Height = 49
     Align = alTop
     TabOrder = 2
-    ExplicitWidth = 936
     DesignSize = (
       931
       49)
@@ -555,7 +551,6 @@
     Height = 99
     Align = alBottom
     TabOrder = 3
-    ExplicitWidth = 936
     DesignSize = (
       931
       99)
@@ -1390,20 +1385,24 @@
     AutoScroll = True
     TabOrder = 4
     ExplicitTop = 279
-    ExplicitWidth = 936
+    ExplicitWidth = 931
     ExplicitHeight = 218
     inherited Panel1: TPanel
       Width = 931
-      ExplicitWidth = 936
+      ExplicitWidth = 931
     end
     inherited grdDatos: TcxGrid
       Width = 931
       Height = 194
-      ExplicitWidth = 936
+      ExplicitWidth = 931
       ExplicitHeight = 194
       inherited dbtvDatos: TcxGridDBTableView
         PopupMenu = PopupMenu1
+        OptionsSelection.CellSelect = False
         OptionsSelection.MultiSelect = True
+        OptionsSelection.CheckBoxPosition = cbpIndicator
+        OptionsSelection.HideSelection = True
+        OptionsSelection.MultiSelectMode = msmPersistent
       end
     end
     inherited srEstilos: TcxStyleRepository
@@ -1420,7 +1419,6 @@
     Height = 56
     Align = alBottom
     TabOrder = 5
-    ExplicitWidth = 936
     DesignSize = (
       931
       56)

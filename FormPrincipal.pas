@@ -8,7 +8,9 @@ uses
   JncMaestro, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Buttons, dmImagenesGrande,
   JncFraCxGrid, DmBascula, JvExStdCtrls, JvEdit, JvValidateEdit, BasculaModelo, FormEtiquetas,
   System.Actions, Vcl.ActnList, JncGridDx, frxClass, frxBarcode, Vcl.Menus,FormTeclado,
-  Vcl.Touch.Keyboard, IniFiles, FormMensaje, ShellAPI,uFrameTecladoVirtual,FormLotesDisponibles;
+  Vcl.Touch.Keyboard, IniFiles, FormMensaje, ShellAPI,uFrameTecladoVirtual,FormLotesDisponibles,
+  cxGridTableView,
+  cxGridDBTableView;
 
 type
   TFrmPrincipal = class(TForm)
@@ -887,6 +889,27 @@ begin
   TJncGridDx.OcultarColumnaNombre(FraCxGridPesadas.dbtvDatos,'ge_Usuario');
   TJncGridDx.OcultarColumnaNombre(FraCxGridPesadas.dbtvDatos,'ge_Json');
 
+   FraCxGridPesadas.dbtvDatos.OptionsSelection.CheckBoxVisibility :=
+    [cbvDataRow, cbvColumnHeader];
+
+  { Ponemos el check en la columna indicadora,
+    separado de los datos }
+  FraCxGridPesadas.dbtvDatos.OptionsSelection.CheckBoxPosition := cbpIndicator;
+
+  { Siempre visibles, importante en pantalla táctil }
+  FraCxGridPesadas.dbtvDatos.OptionsSelection.ShowCheckBoxesDynamically := False;
+
+  { Pulsar fuera del check no elimina lo seleccionado }
+  FraCxGridPesadas.dbtvDatos.OptionsSelection.ClearPersistentSelectionOnOutsideClick := False;
+
+  { Mantener resaltadas las filas aunque pulsemos Imprimir }
+  FraCxGridPesadas.dbtvDatos.OptionsSelection.HideSelection := False;
+
+  { Hacemos grande la zona táctil }
+  FraCxGridPesadas.dbtvDatos.OptionsView.Indicator := True;
+  FraCxGridPesadas.dbtvDatos.OptionsView.IndicatorWidth := 45;
+  FraCxGridPesadas.dbtvDatos.OptionsView.DataRowHeight := 42;
+
 end;
 
 procedure TFrmPrincipal.CargaSqlEtiquetas(vCodCli:string);
@@ -921,6 +944,7 @@ begin
       Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' left outer join alterna with(nolock) on alterna.codart = ge_codart '+
                   ' where ge_id = :PId';
   lCadena :=Bd.SqlTextEtiquetas ;
+
 
 end;
 
@@ -1013,13 +1037,13 @@ end;
 
 procedure TFrmPrincipal.edCodigoEtiquetaClick(Sender: TObject);
 begin
-   edCodigoEtiqueta.SelectAll;
+   {edCodigoEtiqueta.SelectAll;   }
 
-   if Assigned(FTeclado) then
+  { if Assigned(FTeclado) then
    begin
      FTeclado.AutoMostrar := True;
      FTeclado.MostrarPara(edCodigoEtiqueta, ttAlfanumerico);
-   end;
+   end;}
    { TecladoFlotante := TfrmTeclado.Create(Self);
    TecladoFlotante.ShowModal;
     edCodigoEtiqueta.Text := TecladoFlotante.Texto;
@@ -1085,13 +1109,13 @@ end;
 
 procedure TFrmPrincipal.edLoteClick(Sender: TObject);
 begin
-    edLote.SelectAll;
+  {  edLote.SelectAll;
 
     if Assigned(FTeclado) then
     begin
       FTeclado.AutoMostrar := True;
       FTeclado.MostrarPara(edLote, ttAlfanumerico);
-    end;
+    end; }
  {     TecladoFlotante := TfrmTeclado.Create(Self);
    TecladoFlotante.ShowModal;
     edLote.Text := TecladoFlotante.Texto;
@@ -1449,12 +1473,18 @@ var
 begin
   FraArticulo.edCodigoExit(Sender);
 
-
-       //Ahora vemos si tiene una etiqueta asociada
-     if Bd.BuscarEtiquetaCliente(FraCliente.edCodigo.Text, FraArticulo.edCodigo.Text, lEtiqueta) then
-         edCodigoEtiqueta.Text := lEtiqueta
+     if FraCliente.edCodigo.Text <>'' then
+     begin
+         //Ahora vemos si tiene una etiqueta asociada
+         if Bd.BuscarEtiquetaCliente(FraCliente.edCodigo.Text, FraArticulo.edCodigo.Text, lEtiqueta) then
+            edCodigoEtiqueta.Text := lEtiqueta
+         else
+            edCodigoEtiqueta.Text := bd.BuscarEtiquetaArticulo(FraArticulo.edCodigo.Text);
+     end
      else
-         edCodigoEtiqueta.Text := bd.BuscarEtiquetaArticulo(FraArticulo.edCodigo.Text);
+     begin
+          edCodigoEtiqueta.Text := bd.BuscarEtiquetaArticulo(FraArticulo.edCodigo.Text);
+     end;
 
        if edCodigoEtiqueta.Text <> '' then
        begin
@@ -1502,6 +1532,8 @@ var
   lEtiqueta, lDescEtiqueta : string;
 begin
    FraCliente.edCodigoExit(Sender);
+   if FraCliente.edCodigo.Text = '' then
+      exit;
    //Ahora vemos si tiene una etiqueta asociada
    if Bd.BuscarEtiquetaCliente(FraCliente.edCodigo.Text, FraArticulo.edCodigo.Text, lEtiqueta) then
          edCodigoEtiqueta.Text := lEtiqueta
@@ -1606,7 +1638,9 @@ begin
              lCodArt := fieldbyname('ge_codart').AsString;
              lEtiqueta := fieldbyname('ge_etiqueta').AsString;
              lFormato := Bd.BuscarFormatoEtiqueta(lEtiqueta);
+
              CargaSqlEtiquetas(FraCliente.edCodigo.Text);
+
              Bd.ImprimirEtiqueta(lCodArt,lFormato, FraCliente.edCodigo.Text, edlote.Text ,lId);
              bd.MarcaLineaImp(lId);
         end;

@@ -256,7 +256,7 @@ begin
     Q.SQL.Text :=
       'SELECT DISTINCT LTRIM(RTRIM(C.Param3)) AS Lote ' +
       'FROM CABEREGU C WITH (NOLOCK) ' +
-      'WHERE ISNULL(C.ge_cerrado, 0) = 0 ' +
+      'WHERE ISNULL(C.ge_cerrado, ''F'') = ''F'' ' +
       ' AND NULLIF(LTRIM(RTRIM(C.Param3)), '''') IS NOT NULL ' +
       ' AND LTRIM(RTRIM(C.Param3)) LIKE :PPrefijo ' +
       'ORDER BY Lote';
@@ -368,16 +368,19 @@ var
   Lista: TStringList;
   DescripcionArticulo: string;
 begin
+
   Result := False;
   ALote := '';
 
   Lista := TStringList.Create;
   try
+
     if not ConsultarLotes(AConexion, ACodArt, Lista, DescripcionArticulo) then
       Exit;
 
     Frm := TFrmLotesDisponibles.Create(AOwner);
     try
+
       Frm.CargarLista(DescripcionArticulo, Lista);
 
       if Frm.ShowModal = mrOk then
@@ -391,6 +394,7 @@ begin
   finally
     Lista.Free;
   end;
+
 end;
 
 end.
