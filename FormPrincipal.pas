@@ -1109,13 +1109,13 @@ end;
 
 procedure TFrmPrincipal.edLoteClick(Sender: TObject);
 begin
-  {  edLote.SelectAll;
+    edLote.SelectAll;
 
     if Assigned(FTeclado) then
     begin
       FTeclado.AutoMostrar := True;
       FTeclado.MostrarPara(edLote, ttAlfanumerico);
-    end; }
+    end;
  {     TecladoFlotante := TfrmTeclado.Create(Self);
    TecladoFlotante.ShowModal;
     edLote.Text := TecladoFlotante.Texto;
