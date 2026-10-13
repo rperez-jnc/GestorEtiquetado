@@ -109,6 +109,7 @@ type
     procedure EdCantidadClick(Sender: TObject);
     procedure btnImprimirCajasClick(Sender: TObject);
 
+
   private
     FFIcheroIni: TFileName;
     FBd: TdmdDatos;
@@ -1106,6 +1107,7 @@ begin
    if Key = '.' then
       Key := ',';
 end;
+
 
 procedure TFrmPrincipal.edLoteClick(Sender: TObject);
 begin

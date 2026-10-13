@@ -222,6 +222,8 @@ begin
       'WHERE LTRIM(RTRIM(A.CodArt)) = LTRIM(RTRIM(:PCodArt))';
 
     Q.Parameters.ParamByName('PCodArt').Value := Trim(ACodArt);
+    showmessage(Q.SQL.Text);
+    showmessage('Articulo: ' + ACodArt);
     Q.Open;
 
     if Q.IsEmpty then
@@ -256,12 +258,15 @@ begin
     Q.SQL.Text :=
       'SELECT DISTINCT LTRIM(RTRIM(C.Param3)) AS Lote ' +
       'FROM CABEREGU C WITH (NOLOCK) ' +
-      'WHERE ISNULL(C.ge_cerrado, ''F'') = ''F'' ' +
+      'WHERE ((ISNULL(C.ge_cerrado, ''F'') = ''F'') or (C.ge_cerrado = '''')) ' +
       ' AND NULLIF(LTRIM(RTRIM(C.Param3)), '''') IS NOT NULL ' +
       ' AND LTRIM(RTRIM(C.Param3)) LIKE :PPrefijo ' +
       'ORDER BY Lote';
 
     Q.Parameters.ParamByName('PPrefijo').Value := CodTipo + '%';
+
+    showmessage(Q.SQL.Text);
+    showmessage('CodTipo: ' + CodTipo);
     Q.Open;
 
     while not Q.Eof do
