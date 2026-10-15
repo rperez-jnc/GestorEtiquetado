@@ -66,6 +66,10 @@ type
     Label3: TLabel;
     btnImprimirCajas: TBitBtn;
     btnEliminarPesadas: TBitBtn;
+    FraArticuloPadre: TfraMaestro;
+    lblArticuloOrigen: TLabel;
+    lblFao: TLabel;
+    lblArtePesca: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure btnIniciarClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -123,6 +127,7 @@ type
 
 
    function BuscarArticuloF12(Sender: TObject): Boolean;
+   function BuscarArticuloPadreF12(Sender: TObject): Boolean;
    function BuscarClienteF12(Sender: TObject): Boolean;
    function BuscarLoteDisponible: Boolean;
    procedure FinalizarBusquedaF12(AControl: TWinControl);
@@ -154,6 +159,7 @@ var
   FrmPrincipal: TFrmPrincipal;
   SavedWindowState: integer;
   MostradoMensaje: boolean;
+  ArticuloDistribuido : boolean;
 const
   kIniPeso = 'Pesar';
   kFinPeso = 'Fin';
@@ -566,6 +572,8 @@ var
   lUnidades:double;
   lNUmLin : double;
   lListPesos : TStringList;
+  lPesoTot:double;
+
 begin
   lListPesos := TStringList.Create;
   lListPesos.Delimiter := ',';
@@ -587,10 +595,18 @@ begin
 
 
         lLote := edLote.Text;
-        if not bd.BuscarRegularizacion(lLote) then
+        if Not ArticuloDistribuido then  //Para los articulos no distribuidos
         begin
-          MessageDlg('No se encontró ninguna regularización para ese lote', mtError, [mbOK], 0);
-          exit;
+            if not bd.BuscarRegularizacion(lLote) then
+            begin
+              MessageDlg('No se encontró ninguna regularización para ese lote', mtError, [mbOK], 0);
+              exit;
+            end;
+        end  //Para los articulos distribuidos
+        else
+        begin
+           Bd.CrearRegularizacion(FraArticuloPadre.edCodigo.Text, lLote, lblFao.Caption, lblArtePesca.Caption)
+
         end;
         try
           try
@@ -620,14 +636,16 @@ begin
                  lCodArtAnt := lCodArt;
                  lPeso :=  Fieldbyname('ge_peso').AsFloat;
                  lId :=  FieldByName('ge_id').AsFloat;
-
+                 lPesoTot := 0;
                  lUnidades := 0;
                  while not eof do
                  begin
                    if lCodArt <> lCodArtAnt then
                    begin
+                      lPesoTot := lPesoTot + lUnidades;
                       Bd.CrearLineaRegularizacion(lCodArtAnt,lLote,lUnidades ,lListPesos);
                       lUnidades := lPeso;
+
                       lListPesos.Free;
                       lListPesos := TStringList.Create;
                       lListPesos.Delimiter := ',';
@@ -651,7 +669,7 @@ begin
 
                  end;
                  //Creamos la ultima
-
+                 lPesoTot := lPesoTot + lUnidades;
                  Bd.CrearLineaRegularizacion(lCodArtAnt,lLote,lUnidades ,lListPesos);
 
 
@@ -665,7 +683,12 @@ begin
             lIdReg := bd.FinalizarRegularizacion;
             if lIdReg > 0 then
             begin
-              MessageDlg('Se ha modificado la regularizacion ' + Bd.NumeroRegularizacion(lIdReg), mtInformation, [mbOK], 0);
+              if  ArticuloDistribuido then //Si es un articulo distribuido actualizamos las unidades del articulo padre
+                  Bd.ModificaRegularizacion(lIdReg, lPesoTot, lLote);
+              if  ArticuloDistribuido then
+                 MessageDlg('Se ha creado la regularizacion ' + Bd.NumeroRegularizacion(lIdReg), mtInformation, [mbOK], 0)
+              else
+                 MessageDlg('Se ha modificado la regularizacion ' + Bd.NumeroRegularizacion(lIdReg), mtInformation, [mbOK], 0);
               Bd.MarcarLineasRegularizacion(lIdReg);
               CargaLecturas(cbOpciones.ItemIndex, edLote.Text);
             end;
@@ -749,10 +772,36 @@ begin
 
   FraArticulo.Busqueda.ModalResult := mrNone;
 
-  FraArticulo.acBusquedaExecute(Sender);
+ // FraArticulo.acBusquedaExecute(Sender);
+  FraArticulo.Busqueda.acList.Actions[1].Enabled := true;
+  FraArticulo.Busqueda.acList.Actions[2].Enabled := true;
+  FraArticulo.Busqueda.Muestra('Bloqueado = ''F'' and Obsoleto = ''F''');
+  FraArticulo.asignaResultado;
+  FraArticulo.Busqueda.acList.Actions[1].Enabled := false;
+  FraArticulo.Busqueda.acList.Actions[2].Enabled := false;
 
   Result :=
     FraArticulo.Busqueda.ModalResult = mrOk;
+end;
+
+function TFrmPrincipal.BuscarArticuloPadreF12(Sender: TObject): Boolean;
+begin
+   Result := False;
+
+  FraArticuloPadre.Busqueda.ModalResult := mrNone;
+
+ // FraArticuloPadre.acBusquedaExecute(Sender);
+  FraArticuloPadre.Busqueda.acList.Actions[1].Enabled := true;
+  FraArticuloPadre.Busqueda.acList.Actions[2].Enabled := true;
+  FraArticuloPadre.Busqueda.Muestra('Bloqueado = ''F'' and Obsoleto = ''F''');
+  FraArticuloPadre.asignaResultado;
+  FraArticuloPadre.Busqueda.acList.Actions[1].Enabled := false;
+  FraArticuloPadre.Busqueda.acList.Actions[2].Enabled := false;
+
+  Result :=
+    FraArticuloPadre.Busqueda.ModalResult = mrOk;
+  if FraArticuloPadre.edCodigo.Text <> '' then
+     lblArticuloOrigen.Caption := FraArticuloPadre.edCodigo.Text + ' - ' + FraArticuloPadre.edNombre.Text;
 end;
 
 function TFrmPrincipal.BuscarClienteF12(Sender: TObject): Boolean;
@@ -1116,7 +1165,7 @@ begin
     if Assigned(FTeclado) then
     begin
       FTeclado.AutoMostrar := True;
-      FTeclado.MostrarPara(edLote, ttAlfanumerico);
+      FTeclado.MostrarPara(edLote, ttNumerico);
     end;
  {     TecladoFlotante := TfrmTeclado.Create(Self);
    TecladoFlotante.ShowModal;
@@ -1130,6 +1179,7 @@ var
   lCodTipo:string;
   lTipo : string;
   lMensaje : TfrmMensaje;
+  lFao, lArte:string;
 begin
 
   // Si estamos dentro de la busqueda F12, el lote pierde el foco
@@ -1140,19 +1190,41 @@ begin
      //Vamos a mostra un aviso con el codigo de producto que es ese lote
      if edLote.Text <> '' then
      begin
-        lMensaje := TFrmMensaje.Create(Self);
-        try
-        lCodTipo := copy(edlote.Text,1,2);
-        Bd.BuscarTipoArticulo(lCodTipo,lTipo);
-        if ltipo <> '' then
-           lMensaje.Inicializa(lTipo)
 
-        else
-           lMensaje.Inicializa('El lote no pertenece a ningún tipo de articulo');
+        if Not ArticuloDistribuido then
+        begin
 
-        finally
-          lMensaje.ShowModal;
-          lMensaje.Free;
+          lMensaje := TFrmMensaje.Create(Self);
+          try
+          lCodTipo := copy(edlote.Text,1,2);
+          Bd.BuscarTipoArticulo(lCodTipo,lTipo);
+          if ltipo <> '' then
+             lMensaje.Inicializa(lTipo)
+
+          else
+             lMensaje.Inicializa('El lote no pertenece a ningún tipo de articulo');
+
+          finally
+            lMensaje.ShowModal;
+            lMensaje.Free;
+
+          end;
+        end
+        else   //Articulo distribuido. Pedimos el articulo padre
+        begin
+            BuscarArticuloPadreF12(Sender);
+            //Buscamos la FAO y arte de pesca de la compra de ese lote
+           if not bd.BuscarDatosCompraLote(FraArticuloPadre.edCodigo.Text,edlote.Text, lFao, lArte) then
+           begin
+              MessageDlg('El lote indicado del articulo ' + FraArticuloPadre.edCodigo.Text + ' no se ha comprado', mtError, [mbOK], 0);
+              edlote.SetFocus;
+              exit;
+           end
+           else
+           begin
+             lblArtePesca.Caption := lArte;
+             lblFao.Caption := lFao;
+           end;
 
         end;
 
@@ -1300,6 +1372,7 @@ begin
   FTeclado.AlturaVisorTexto := 60;
   FTeclado.RegistrarNumerico(EdCantidad);
   FTeclado.RegistrarNumerico(edPesoManual);
+  FTeclado.RegistrarAlfanumerico(edLote);
 
    // 5. MUY IMPORTANTE:
   // crear las teclas y activar la deteccion SOLO ahora
@@ -1308,6 +1381,7 @@ begin
    Show;
 
    FraArticulo.inicializa(gFicheroIni, edArticulo,true);
+   FraArticuloPadre.inicializa(gFicheroIni, edArticulo,true);
    FraCliente.inicializa(gFicheroIni, edCliente,True);
    dtFechaPesada.Date := Now();
    FFormularioCargado:= False;
@@ -1333,6 +1407,10 @@ begin
    CargaConfiguracion;
    MostradoMensaje := False;
    edCantidad.Text := '1';
+   ArticuloDistribuido := false;
+   lblArticuloOrigen.Caption := '';
+   lblArtePesca.Caption :='';
+   lblFao.Caption := '';
 end;
 
 procedure TFrmPrincipal.FormKeyDown(
@@ -1395,7 +1473,11 @@ begin
 
     else if edLote.Focused then
     begin
-
+      if ArticuloDistribuido then
+      begin
+          MessageDlg('El articulo es distribuido. Indique manualmente el lote', mtInformation, [mbOK], 0);
+          exit;
+      end;
       if BuscarLoteDisponible then
         FinalizarBusquedaF12(
           edLote
@@ -1472,9 +1554,10 @@ end;
 procedure TFrmPrincipal.FraArticuloedCodigoExit(Sender: TObject);
 var
   lEtiqueta, lDescEtiqueta: string;
+  lArticuloDistribuidoAnt:boolean;
 begin
   FraArticulo.edCodigoExit(Sender);
-
+  lArticuloDistribuidoAnt := ArticuloDistribuido;
      if FraCliente.edCodigo.Text <>'' then
      begin
          //Ahora vemos si tiene una etiqueta asociada
@@ -1501,6 +1584,20 @@ begin
          edEtiqueta.Text := letiqueta;
          edDescEtiqueta.Text := lDescEtiqueta;
        end;
+
+   if edCodigoEtiqueta.Text <> '' then
+     if cuadrasiesnumerico(edCodigoEtiqueta.Text,8) = cuadrasiesnumerico(bd.EtiDist,8) then
+        ArticuloDistribuido := true
+     else
+        ArticuloDistribuido := false;
+   if lArticuloDistribuidoAnt and Not ArticuloDistribuido then
+   begin
+      MessageDlg('El articulo anterior era distribuido. Esta seleccionando un articulo no distribuido. ',
+        mtInformation,
+        [mbOK],
+        0
+      );
+   end;
 
 
 end;
@@ -1555,8 +1652,11 @@ begin
          edEtiqueta.Text := letiqueta;
          edDescEtiqueta.Text := lDescEtiqueta;
        end;
-
-
+     if edCodigoEtiqueta.Text <> '' then
+       if cuadrasiesnumerico(edCodigoEtiqueta.Text,8) = cuadrasiesnumerico(bd.EtiDist,8) then
+          ArticuloDistribuido := true
+       else
+          ArticuloDistribuido := false;
 
 end;
 

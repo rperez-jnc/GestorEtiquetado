@@ -69,6 +69,8 @@ type
     FParamLote: string;
     FEtiqueta: string;
     FImpCajas: string;
+    FEtiDist: string;
+    FAlmacenReg: string;
     { Private declarations }
   public
     { Public declarations }
@@ -95,6 +97,8 @@ type
     function BuscarFormatoEtiqueta(vCodigo:string):string;
     procedure CrearLineaRegularizacion(vCodArt,vLote:string;vPeso: double; vListPesos:TStringList);
     function BuscarRegularizacion(vLote: string):boolean;
+    procedure CrearRegularizacion(vCodArt, vLote, vFao, vArte:string);
+    procedure ModificaRegularizacion(vIdReg, vPesoTot: double; vLote:string);
     function FinalizarRegularizacion:double;
     procedure CancelaRegularizacion;
     procedure MarcarLineasRegularizacion(vIdReg : double);
@@ -107,6 +111,7 @@ type
     procedure EliminarPesada(lId:double);
     procedure CambiarEtiqueta(vId: double;vCodigoEtiqueta:string);
     procedure BuscarTipoArticulo(vCodTipo:string; Var vTipo:string) ;
+    function BuscarDatosCompraLote(vCodArt,vLote:string; Var vFao, vArte:string):boolean;
 
 
     property Empresa:string read FEmpresa write FEmpresa;
@@ -131,6 +136,8 @@ type
     property ParamId:integer read FParamId write FParamId;
     property Etiqueta: string read FEtiqueta write FEtiqueta;
     property ImpCajas: string read FImpCajas write FImpCajas;
+    property EtiDist: string read FEtiDist write FEtiDist;
+    property AlmacenReg:string read FAlmacenReg write FAlmacenReg;
   end;
 
 var
@@ -228,6 +235,34 @@ begin
       end;
       next;
     end;   *)
+
+  end;
+end;
+
+function TdmdDatos.BuscarDatosCompraLote(vCodArt, vLote: string; var vFao,
+  vArte: string): boolean;
+begin
+  with sqlCOnsulta do
+  begin
+    close;
+    sql.Clear;
+
+    sql.Add('Select top 1 sal_fao, sal_artepesca');
+    sql.Add('from linealba with(nolock)');
+    sql.Add('where idalbc is not null');
+    sql.Add('and codart = ' + quotedstr(cuadrasiesnumerico(vCodart,15)));
+    sql.Add('and lote = ' + quotedstr(cuadrasiesnumerico(vLote,25)));
+    sql.Add('order by idalbc desc');
+    open;
+
+    if recordcount = 0 then
+       result := false
+    else
+    begin
+      result := true;
+      vFao := fieldbyname('sal_fao').AsString;
+      vArte := fieldbyname('sal_artepesca').AsString;
+    end;
 
   end;
 end;
@@ -501,6 +536,27 @@ begin
   end;
 end;
 
+procedure TdmdDatos.CrearRegularizacion(vCodArt, vLote, vFao, vArte: string);
+var
+  lIdReg : double;
+begin
+   Naxregularizacion := coRegularizacion.Create;
+   NaxRegularizacion.Iniciar;
+   NaxRegularizacion.Nuevo(datetostr(Now), Almacenreg);
+   NaxRegularizacion.NuevaLineaArt(vCodArt,-1);
+   NaxRegularizacion.AsStringLin['Sal_Fao'] := vFao;
+   NaxRegularizacion.AsStringLin['Sal_ArtePesca'] := vArte;
+
+   NaxRegularizacion.AnadirDetalle(-1,'',vLote,'','');
+   Naxregularizacion.AnadirLinea;
+   lIdReg := NaxRegularizacion.Anade;
+   NaxRegularizacion.Acabar;
+
+   Naxregularizacion := coRegularizacion.Create;
+   NaxRegularizacion.Iniciar;
+   NaxRegularizacion.Modifica(lIdReg);
+end;
+
 procedure TdmdDatos.EdicionDeArticulo(vCodart: String);
 var
   naxOpcion: Opcion;
@@ -701,6 +757,8 @@ begin
   ImpresoraEtiArt := vIni.ReadString('Opciones','ImpresoraEtiArt','');
   Etiqueta := vIni.ReadString('Opciones','Etiqueta','');
   ImpCajas := vIni.ReadString('Opciones','ImpCajas','T');
+  EtiDist := vIni.ReadString('Opciones','EtiDist','');
+  AlmacenReg  := vIni.ReadString('Opciones','AlmacenReg','');
 
 end;
 
@@ -784,6 +842,36 @@ begin
        next;
     end;
   end;
+end;
+
+procedure TdmdDatos.ModificaRegularizacion(vIdReg, vPesoTot: double; vLote:string);
+var
+  lIdLinea:double;
+  lNumLin:double;
+begin
+   //BUscamos el id de la linea negativa para cambiarle las unidades
+   with sqlCOnsulta do
+   begin
+     close;
+     sql.Clear;
+
+     sql.Add('Select idlin, numlin from lineregu with(nolock) where idreg = ' + formateafloatsql(vIdreg) + ' and unidades < 0');
+     open;
+
+    lIdLinea := fieldbyname('idlin').AsFloat;
+    lNUmLin := fieldbyname('numlin').Asfloat;
+   end;
+
+  Naxregularizacion := coRegularizacion.Create;
+  NaxRegularizacion.Iniciar;
+  NaxRegularizacion.Modifica(vIdReg);
+  NaxRegularizacion.EditarLinea(lNUmLin);
+  NaxRegularizacion.AsFloatLin['unidades'] := vPesotot * -1;
+  NaxRegularizacion.CambiarDetalle(lIdLinea,vPesotot * -1,'',vLote,'','');
+  NaxRegularizacion.AnadirLinea;
+  NaxRegularizacion.Anade;
+  NaxRegularizacion.Acabar;
+
 end;
 
 function TdmdDatos.NumeroRegularizacion(vIdReg: double): string;

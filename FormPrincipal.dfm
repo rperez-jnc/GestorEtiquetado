@@ -31,8 +31,110 @@
     DesignSize = (
       931
       166)
+    object lblArticuloOrigen: TLabel
+      Left = 42
+      Top = 143
+      Width = 127
+      Height = 19
+      BiDiMode = bdLeftToRight
+      Caption = 'Articulo origen:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentBiDiMode = False
+      ParentFont = False
+    end
+    object lblFao: TLabel
+      Left = 767
+      Top = 143
+      Width = 29
+      Height = 19
+      BiDiMode = bdLeftToRight
+      Caption = 'Fao'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentBiDiMode = False
+      ParentFont = False
+      Visible = False
+    end
+    object lblArtePesca: TLabel
+      Left = 823
+      Top = 143
+      Width = 87
+      Height = 19
+      BiDiMode = bdLeftToRight
+      Caption = 'Arte pesca'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentBiDiMode = False
+      ParentFont = False
+      Visible = False
+    end
+    inline FraArticuloPadre: TfraMaestro
+      Left = 151
+      Top = 2
+      Width = 817
+      Height = 41
+      Anchors = [akLeft, akTop, akRight]
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 10
+      Visible = False
+      ExplicitLeft = 151
+      ExplicitTop = 2
+      ExplicitWidth = 817
+      ExplicitHeight = 41
+      inherited Bttmaestro: TBitBtn [0]
+        Left = 103
+        Top = 3
+        Width = 34
+        Height = 27
+        ExplicitLeft = 103
+        ExplicitTop = 3
+        ExplicitWidth = 34
+        ExplicitHeight = 27
+      end
+      inherited edCodigo: TEdit [1]
+        Left = 0
+        Width = 97
+        Height = 27
+        Font.Height = -16
+        ExplicitLeft = 0
+        ExplicitWidth = 97
+        ExplicitHeight = 27
+      end
+      inherited edNombre: TEdit [2]
+        Left = 103
+        Width = 716
+        Height = 27
+        Anchors = [akLeft, akTop, akRight]
+        Font.Height = -16
+        ExplicitLeft = 103
+        ExplicitWidth = 716
+        ExplicitHeight = 27
+      end
+      inherited Acciones: TActionList
+        Left = 552
+        Top = 8
+        inherited acBusqueda: TAction
+          ShortCut = 0
+        end
+      end
+    end
     object btnBuscarEtiquetas: TBitBtn
-      Left = 206
+      Left = 231
       Top = 110
       Width = 34
       Height = 27
@@ -109,35 +211,35 @@
       ExplicitWidth = 817
       ExplicitHeight = 41
       inherited Bttmaestro: TBitBtn [0]
-        Left = 103
+        Left = 128
         Top = 3
         Width = 34
         Height = 27
         OnClick = FraArticuloBttmaestroClick
-        ExplicitLeft = 103
+        ExplicitLeft = 128
         ExplicitTop = 3
         ExplicitWidth = 34
         ExplicitHeight = 27
       end
       inherited edCodigo: TEdit [1]
         Left = 0
-        Width = 97
+        Width = 122
         Height = 27
         Font.Height = -16
         OnClick = FraArticuloedCodigoClick
         OnExit = FraArticuloedCodigoExit
         ExplicitLeft = 0
-        ExplicitWidth = 97
+        ExplicitWidth = 122
         ExplicitHeight = 27
       end
       inherited edNombre: TEdit [2]
-        Left = 103
-        Width = 716
+        Left = 128
+        Width = 691
         Height = 27
         Anchors = [akLeft, akTop, akRight]
         Font.Height = -16
-        ExplicitLeft = 103
-        ExplicitWidth = 716
+        ExplicitLeft = 128
+        ExplicitWidth = 691
         ExplicitHeight = 27
       end
       inherited Acciones: TActionList
@@ -152,7 +254,7 @@
     object edCodigoEtiqueta: TEdit
       Left = 103
       Top = 110
-      Width = 100
+      Width = 122
       Height = 27
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -164,9 +266,9 @@
       TabOrder = 2
     end
     object edEtiqueta: TEdit
-      Left = 209
+      Left = 231
       Top = 110
-      Width = 290
+      Width = 268
       Height = 27
       BiDiMode = bdLeftToRight
       Font.Charset = DEFAULT_CHARSET
@@ -223,35 +325,35 @@
       ExplicitWidth = 814
       ExplicitHeight = 41
       inherited Bttmaestro: TBitBtn [0]
-        Left = 103
+        Left = 128
         Top = 3
         Width = 34
         Height = 27
         OnClick = fraClienteBttmaestroClick
-        ExplicitLeft = 103
+        ExplicitLeft = 128
         ExplicitTop = 3
         ExplicitWidth = 34
         ExplicitHeight = 27
       end
       inherited edCodigo: TEdit [1]
         Left = 0
-        Width = 97
+        Width = 122
         Height = 27
         Font.Height = -16
         OnClick = fraClienteedCodigoClick
         OnExit = fraClienteedCodigoExit
         ExplicitLeft = 0
-        ExplicitWidth = 97
+        ExplicitWidth = 122
         ExplicitHeight = 27
       end
       inherited edNombre: TEdit [2]
-        Left = 103
-        Width = 713
+        Left = 128
+        Width = 688
         Height = 27
         Anchors = [akLeft, akTop, akRight]
         Font.Height = -16
-        ExplicitLeft = 103
-        ExplicitWidth = 713
+        ExplicitLeft = 128
+        ExplicitWidth = 688
         ExplicitHeight = 27
       end
       inherited Acciones: TActionList
@@ -265,7 +367,7 @@
     end
     object BtnCliente: TBitBtn
       Left = 5
-      Top = 19
+      Top = 22
       Width = 92
       Height = 34
       Caption = 'Cliente:'
@@ -344,7 +446,6 @@
       Font.Name = 'Tahoma'
       Font.Style = []
       MaxLength = 25
-      NumbersOnly = True
       ParentBiDiMode = False
       ParentFont = False
       TabOrder = 0

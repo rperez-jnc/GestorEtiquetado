@@ -62,6 +62,7 @@ type
     FControlActivo: TWinControl;
 
     FTipoTeclado: TTipoTeclado;
+    FTipoForzadoManual: Boolean;
     FMayusculas: Boolean;
     FSeparadorDecimal: Char;
     FPermitirNegativos: Boolean;
@@ -351,6 +352,7 @@ begin
   Color := clBtnFace;
 
   FTipoTeclado := ttAlfanumerico;
+  FTipoForzadoManual := False;
   FTipoPorDefecto := ttAlfanumerico;
   FMayusculas := True;
   FPermitirNegativos := True;
@@ -704,7 +706,9 @@ begin
   CrearTecla(F, '2', '2', tkTexto);
   CrearTecla(F, '3', '3', tkTexto);
 
-  B := CrearTecla(F, '+/-', '', tkSigno, 2);
+  { Solo signo negativo: se inserta un guion en la posicion del cursor,
+    detras de lo ya escrito. No alterna el signo al principio. }
+  B := CrearTecla(F, '-', '-', tkTexto, 2);
   B.Enabled := FPermitirNegativos;
 
   { Fila 4 }
@@ -892,6 +896,10 @@ end;
 
 procedure TFrameTecladoVirtual.WMCambiarModo(var Msg: TMessage);
 begin
+  { El usuario ha pulsado 123/ABC: su eleccion manda sobre la deteccion
+    automatica mientras no cambie de control. }
+  FTipoForzadoManual := True;
+
   if Msg.WParam = Ord(ttNumerico) then
     SetTipoTeclado(ttNumerico)
   else
@@ -911,6 +919,7 @@ begin
     FControlActivo.RemoveFreeNotification(Self);
 
   FControlActivo := Value;
+  FTipoForzadoManual := False;
   FBufferModificado := False;
   FReemplazarBufferEnPrimeraEntrada := False;
 
@@ -1814,7 +1823,7 @@ begin
             (TCustomEdit(ControlFoco).Text <> FBufferTexto) then
       CargarBufferDesdeControl;
 
-    if FTipoTeclado <> NuevoTipo then
+    if (not FTipoForzadoManual) and (FTipoTeclado <> NuevoTipo) then
       SetTipoTeclado(NuevoTipo);
 
     if FAutoMostrar then
@@ -2042,18 +2051,25 @@ procedure TFrameTecladoVirtual.MostrarPara(
 );
 begin
   SetControlActivo(AControl);
+
+  { Tipo pedido explicitamente: la deteccion automatica no debe
+    sobreescribirlo en el siguiente tick del timer. }
+  FTipoForzadoManual := True;
+
   SetTipoTeclado(ATipo);
   MostrarInterno;
 end;
 
 procedure TFrameTecladoVirtual.MostrarAlfanumerico;
 begin
+  FTipoForzadoManual := True;
   SetTipoTeclado(ttAlfanumerico);
   MostrarInterno;
 end;
 
 procedure TFrameTecladoVirtual.MostrarNumerico;
 begin
+  FTipoForzadoManual := True;
   SetTipoTeclado(ttNumerico);
   MostrarInterno;
 end;
@@ -2067,6 +2083,8 @@ begin
     if Assigned(Parent) then
       Parent.Realign;
   end;
+
+  FTipoForzadoManual := False;
 
   { Ocultar no confirma datos pendientes. Solo ENTER o una tecla de funcion
     confirma el buffer. }
