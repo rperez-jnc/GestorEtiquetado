@@ -1531,7 +1531,7 @@ begin
   FraArticulo.asignaResultado;
   FraArticulo.Busqueda.acList.Actions[1].Enabled := false;
   FraArticulo.Busqueda.acList.Actions[2].Enabled := false;
-
+  FraArticuloedCodigoExit(Sender);
 end;
 
 procedure TFrmPrincipal.FraArticuloedCodigoClick(Sender: TObject);
@@ -1610,7 +1610,7 @@ end;
 procedure TFrmPrincipal.fraClienteBttmaestroClick(Sender: TObject);
 begin
   fraCliente.BttmaestroClick(Sender);
-
+  fraClienteedCodigoExit(Sender);
 end;
 
 procedure TFrmPrincipal.fraClienteedCodigoClick(Sender: TObject);

@@ -309,7 +309,7 @@
     end
     inline fraCliente: TfraMaestro
       Left = 103
-      Top = 19
+      Top = 23
       Width = 814
       Height = 41
       Anchors = [akLeft, akTop, akRight]
@@ -321,7 +321,7 @@
       ParentFont = False
       TabOrder = 0
       ExplicitLeft = 103
-      ExplicitTop = 19
+      ExplicitTop = 23
       ExplicitWidth = 814
       ExplicitHeight = 41
       inherited Bttmaestro: TBitBtn [0]
