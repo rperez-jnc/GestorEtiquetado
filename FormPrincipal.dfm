@@ -47,8 +47,8 @@
       ParentFont = False
     end
     object lblFao: TLabel
-      Left = 767
-      Top = 143
+      Left = 548
+      Top = 141
       Width = 29
       Height = 19
       BiDiMode = bdLeftToRight
@@ -60,10 +60,9 @@
       Font.Style = [fsBold]
       ParentBiDiMode = False
       ParentFont = False
-      Visible = False
     end
     object lblArtePesca: TLabel
-      Left = 823
+      Left = 691
       Top = 143
       Width = 87
       Height = 19
@@ -76,7 +75,6 @@
       Font.Style = [fsBold]
       ParentBiDiMode = False
       ParentFont = False
-      Visible = False
     end
     inline FraArticuloPadre: TfraMaestro
       Left = 151
@@ -282,8 +280,8 @@
       TabOrder = 4
     end
     object EdIdEtiqueta: TEdit
-      Left = 640
-      Top = 143
+      Left = 384
+      Top = 139
       Width = 121
       Height = 21
       TabOrder = 5

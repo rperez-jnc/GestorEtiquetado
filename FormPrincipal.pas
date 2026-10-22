@@ -143,8 +143,8 @@ type
     procedure GuardarPesada;
     function BuscaEtiqueta: Boolean;
     Procedure CargaLecturas(vTipo:integer; vlote:string);
-    procedure CargaSqlEtiquetas(vCodCli:string);
-    procedure CargaSqlEtiquetasCaja(vCodCli: string; vPesoTotal: Double);
+    procedure CargaSqlEtiquetas(vCodCli:string; vFao, vArtePesca:string);
+    procedure CargaSqlEtiquetasCaja(vCodCli: string; vPesoTotal: Double; vFao, vArtePesca:string);
 
 
 
@@ -361,7 +361,7 @@ begin
 
       CargaSqlEtiquetasCaja(
         FraCliente.edCodigo.Text,
-        lPesoTotal
+        lPesoTotal, lblFao.Caption, lblArtePesca.Caption
       );
 
 
@@ -427,7 +427,7 @@ end;
 procedure TFrmPrincipal.btnDiseñarEtiquetaClick(Sender: TObject);
 begin
    screen.Cursor := crHourGlass;
-   CargaSqlEtiquetas(bd.paramCodCli);
+   CargaSqlEtiquetas(bd.paramCodCli ,lblFao.Caption, lblArtePesca.Caption);
    Bd.ConsultaDatosEtiquetas(paramCodCli,paramLote,paramId,'Diseño');
    screen.Cursor := crDefault;
    frxreport.DataSet := Bd.DsEtiqueta;
@@ -455,7 +455,7 @@ begin
              lCodArt := fieldbyname('ge_codart').AsString;
              lEtiqueta := fieldbyname('ge_etiqueta').AsString;
              lFormato := Bd.BuscarFormatoEtiqueta(lEtiqueta);
-             CargaSqlEtiquetas(FraCliente.edCodigo.Text);
+             CargaSqlEtiquetas(FraCliente.edCodigo.Text, lblFao.Caption, lblArtePesca.Caption);
              Bd.ImprimirEtiqueta(lCodArt,lFormato, FraCliente.edCodigo.Text, edLote.Text ,lId);
              bd.MarcaLineaImp(lId);
         end;
@@ -493,7 +493,7 @@ begin
                lEtiqueta := TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_Etiqueta');
                lId := TJncGridDx.BuscaValor(FraCxGridPesadas.dbtvDatos,FraCxGridPesadas.dbtvDatos.Controller.SelectedRecords[li].RecordIndex,'ge_Id');
                lFormato := Bd.BuscarFormatoEtiqueta(lEtiqueta);
-               CargaSqlEtiquetas(FraCliente.edCodigo.Text);
+               CargaSqlEtiquetas(FraCliente.edCodigo.Text, lblFao.Caption, lblArtePesca.Caption);
                Bd.ImprimirEtiqueta(lCodArt,lFormato,FraCliente.edCodigo.Text, EdLote.Text, lId);
                bd.JvmLineasMarcar.Appendrecord([lId]);
                Screen.Cursor := crDefault;
@@ -962,13 +962,18 @@ begin
 
 end;
 
-procedure TFrmPrincipal.CargaSqlEtiquetas(vCodCli:string);
+procedure TFrmPrincipal.CargaSqlEtiquetas(vCodCli:string; vFao, vArtePesca:string);
 var
  lCadena : string;
 begin
     Bd.SqlTextEtiquetas := 'Select top 1 ge_id, ge_codart, ge_descripcion, ge_lote,ge_peso,articulo.sal_ingredientes,articulo.SAL_METOPROD, articulo.SAL_ALERGENOS,articulo.SAL_FABRICADOPOR, articulo.SAL_ENVASADOPOR,'+
                   ' articulo.SAL_DIASCADUCA, articulo.SAL_CONSERVACION, articulo.SAL_ANGRASASTOTAL,articulo.SAL_ANVALENE, articulo.SAL_ANGTSATURADAS, articulo.SAL_ANHIDRACAR, articulo.SAL_ANHCAZUCAR,' +
-                  ' articulo.SAL_ANPROTEINAS, articulo.SAL_ANSAL, Caberegu.param1 Fao, Caberegu.param2 Arte, DATEADD(DAY, articulo.sal_DiasCaduca, GETDATE()) AS FechaCaducidad, '+
+                  ' articulo.SAL_ANPROTEINAS, articulo.SAL_ANSAL';
+     if edCodigoEtiqueta.Text <> cuadrasiesnumerico(bd.EtiDist,8) then
+        Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas  + ', Caberegu.param1 Fao,Caberegu.param2 Arte'
+     else
+        Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas  + ', ' + quotedstr(vFao) + ' Fao, ' + quotedstr(vArtePesca) + ' Arte';
+     Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas  + ', Sal_Fao.NomFao, DATEADD(DAY, articulo.sal_DiasCaduca, GETDATE()) AS FechaCaducidad, '+
                   ' alterna.codalt,';
       if vCodCli <> '' then
       begin
@@ -991,21 +996,25 @@ begin
                   ' left outer join CABEREGU with (nolock) on caberegu.param3 = :PLote ';
       if vCodCli <> '' then
           Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' left outer join refcli with(nolock) on refcli.codcli = :PCodCLi and refcli.codart = ge_codart ';
-      Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' left outer join alterna with(nolock) on alterna.codart = ge_codart '+
-                  ' where ge_id = :PId';
+      Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' left outer join alterna with(nolock) on alterna.codart = ge_codart ';
+      if edCodigoEtiqueta.Text <> cuadrasiesnumerico(bd.EtiDist,8) then
+        Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' left outer join sal_fao with(nolock) on upper(sal_fao.FAO) = Upper(Caberegu.param1) '
+      else
+        Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' left outer join sal_fao with(nolock) on upper(sal_fao.FAO) = Upper(' + quotedstr(vFao)  + ')';
+      Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' where ge_id = :PId';
   lCadena :=Bd.SqlTextEtiquetas ;
 
 
 end;
 
 procedure TFrmPrincipal.CargaSqlEtiquetasCaja(vCodCli: string;
-  vPesoTotal: Double);
+  vPesoTotal: Double; vFao, vArtePesca:string);
 var
   FS: TFormatSettings;
   lPesoSQL: string;
 begin
   // Cargamos exactamente la misma SQL que para una etiqueta normal
-  CargaSqlEtiquetas(vCodCli);
+  CargaSqlEtiquetas(vCodCli, vFao, vArtePesca);
 
   // SQL Server necesita punto como separador decimal
   FS := TFormatSettings.Create;
@@ -1741,7 +1750,7 @@ begin
              lEtiqueta := fieldbyname('ge_etiqueta').AsString;
              lFormato := Bd.BuscarFormatoEtiqueta(lEtiqueta);
 
-             CargaSqlEtiquetas(FraCliente.edCodigo.Text);
+             CargaSqlEtiquetas(FraCliente.edCodigo.Text,lblFao.Caption, lblArtePesca.Caption );
 
              Bd.ImprimirEtiqueta(lCodArt,lFormato, FraCliente.edCodigo.Text, edlote.Text ,lId);
              bd.MarcaLineaImp(lId);
