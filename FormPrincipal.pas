@@ -145,7 +145,7 @@ type
     Procedure CargaLecturas(vTipo:integer; vlote:string);
     procedure CargaSqlEtiquetas(vCodCli:string; vFao, vArtePesca:string);
     procedure CargaSqlEtiquetasCaja(vCodCli: string; vPesoTotal: Double; vFao, vArtePesca:string);
-
+    function ExisteCodigoEtiqueta(const ListaCodigos, CodigoEtiqueta: string): Boolean;
 
 
     property Bd:TdmdDatos read FBd write FBd;
@@ -969,10 +969,10 @@ begin
     Bd.SqlTextEtiquetas := 'Select top 1 ge_id, ge_codart, ge_descripcion, ge_lote,ge_peso,articulo.sal_ingredientes,articulo.SAL_METOPROD, articulo.SAL_ALERGENOS,articulo.SAL_FABRICADOPOR, articulo.SAL_ENVASADOPOR,'+
                   ' articulo.SAL_DIASCADUCA, articulo.SAL_CONSERVACION, articulo.SAL_ANGRASASTOTAL,articulo.SAL_ANVALENE, articulo.SAL_ANGTSATURADAS, articulo.SAL_ANHIDRACAR, articulo.SAL_ANHCAZUCAR,' +
                   ' articulo.SAL_ANPROTEINAS, articulo.SAL_ANSAL';
-     if edCodigoEtiqueta.Text <> cuadrasiesnumerico(bd.EtiDist,8) then
-        Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas  + ', Caberegu.param1 Fao,Caberegu.param2 Arte'
+     if not ExisteCodigoEtiqueta(Bd.EtiDist, edCodigoEtiqueta.Text) then
+       Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ', Caberegu.param1 Fao,Caberegu.param2 Arte'
      else
-        Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas  + ', ' + quotedstr(vFao) + ' Fao, ' + quotedstr(vArtePesca) + ' Arte';
+       Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas  + ', ' + quotedstr(vFao) + ' Fao, ' + quotedstr(vArtePesca) + ' Arte';
      Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas  + ', Sal_Fao.NomFao, DATEADD(DAY, articulo.sal_DiasCaduca, GETDATE()) AS FechaCaducidad, '+
                   ' alterna.codalt,';
       if vCodCli <> '' then
@@ -997,7 +997,7 @@ begin
       if vCodCli <> '' then
           Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' left outer join refcli with(nolock) on refcli.codcli = :PCodCLi and refcli.codart = ge_codart ';
       Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' left outer join alterna with(nolock) on alterna.codart = ge_codart ';
-      if edCodigoEtiqueta.Text <> cuadrasiesnumerico(bd.EtiDist,8) then
+      if not ExisteCodigoEtiqueta(Bd.EtiDist, edCodigoEtiqueta.Text) then
         Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' left outer join sal_fao with(nolock) on upper(sal_fao.FAO) = Upper(Caberegu.param1) '
       else
         Bd.SqlTextEtiquetas := Bd.SqlTextEtiquetas + ' left outer join sal_fao with(nolock) on upper(sal_fao.FAO) = Upper(' + quotedstr(vFao)  + ')';
@@ -1166,6 +1166,33 @@ begin
       Key := ',';
 end;
 
+
+function TFrmPrincipal.ExisteCodigoEtiqueta(const ListaCodigos,
+  CodigoEtiqueta: string): Boolean;
+var
+  Lista: TStringList;
+  i: Integer;
+begin
+  Result := False;
+  Lista := TStringList.Create;
+  try
+    Lista.Delimiter := ',';
+    Lista.StrictDelimiter := True;
+    Lista.DelimitedText := ListaCodigos;
+
+    for i := 0 to Lista.Count - 1 do
+    begin
+      if CodigoEtiqueta = StringOfChar(' ', 8 - Length(Trim(Lista[i]))) + Trim(Lista[i]) then
+      begin
+        Result := True;
+        Break;
+      end;
+    end;
+  finally
+    Lista.Free;
+  end;
+
+end;
 
 procedure TFrmPrincipal.edLoteClick(Sender: TObject);
 begin
@@ -1595,7 +1622,7 @@ begin
        end;
 
    if edCodigoEtiqueta.Text <> '' then
-     if cuadrasiesnumerico(edCodigoEtiqueta.Text,8) = cuadrasiesnumerico(bd.EtiDist,8) then
+     if  ExisteCodigoEtiqueta(Bd.EtiDist, cuadrasiesnumerico(edCodigoEtiqueta.Text,8)) then
         ArticuloDistribuido := true
      else
         ArticuloDistribuido := false;
@@ -1662,7 +1689,7 @@ begin
          edDescEtiqueta.Text := lDescEtiqueta;
        end;
      if edCodigoEtiqueta.Text <> '' then
-       if cuadrasiesnumerico(edCodigoEtiqueta.Text,8) = cuadrasiesnumerico(bd.EtiDist,8) then
+       if  ExisteCodigoEtiqueta(Bd.EtiDist, cuadrasiesnumerico(edCodigoEtiqueta.Text,8)) then
           ArticuloDistribuido := true
        else
           ArticuloDistribuido := false;
