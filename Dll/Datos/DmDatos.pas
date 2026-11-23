@@ -3,10 +3,12 @@ unit DmDatos;
 interface
 
 uses
-  System.SysUtils, System.Classes, DLL_dmEstandar, Data.DB, Data.Win.ADODB, JncLib;
+  System.SysUtils, System.Classes, DLL_dmEstandar, Data.DB, Data.Win.ADODB, JncLib, Dialogs, System.UITypes;
 
 type
   TdmdDatos = class(TdmDLL)
+    sqlLotes: TADOQuery;
+    DsLotes: TDataSource;
   private
     { Private declarations }
   public
@@ -16,6 +18,9 @@ type
 
     procedure RecuperarPesadas(vListaIdPesos: TStringList);
     procedure BuscarFaoArte(vCodArt, vLote:string; Var vFaoC, vArteC:string );
+    procedure ObtenerUnidadesPesoArticulo(vCodArt, VLote:string; Var vUnidades: integer; Var vKilos:double);
+    function ArticuloDobleUnidad(vCodArt:string):boolean;
+    procedure BuscarLotes(vCodart:string; Var vDescripcion:string);
   end;
 
 var
@@ -28,6 +33,22 @@ implementation
 {$R *.dfm}
 
 { TdmdDatos }
+
+function TdmdDatos.ArticuloDobleUnidad(vCodArt: string): boolean;
+begin
+   with query do
+  begin
+    close;
+    sql.Clear;
+    sql.add('Select coalesce(Sal_2Unidad,''F'') Unidad from articulo with(nolock)');
+    sql.Add(' where codart = ' + quotedstr(vCodArt));
+
+    open;
+
+    result := fieldbyname('Unidad').AsString = 'T';
+
+  end;
+end;
 
 procedure TdmdDatos.AsignarFAO(vIdReg: double;  vFao, vArte:string);
 begin
@@ -63,6 +84,72 @@ begin
 
     vFaoC := fieldbyname('FAo').AsString;
     vArteC:= fieldbyname('Arte').AsString;
+  end;
+end;
+
+procedure TdmdDatos.BuscarLotes(vCodart: string; Var vDescripcion:string);
+var
+  CodFamEst: string;
+  CodTipo: string;
+  Lote: string;
+begin
+  with query do
+  begin
+    close;
+    sql.Clear;
+
+    sql.Add('SELECT TOP 1 ');
+    sql.Add(' LTRIM(RTRIM(A.DescArt)) AS DescArt, ');
+    sql.Add(' LTRIM(RTRIM(A.CodFamEst)) AS CodFamEst, ');
+    sql.Add('LTRIM(RTRIM(T.sal_codtipo)) AS CodTipo ');
+    sql.Add('FROM Articulo A WITH (NOLOCK) ');
+    sql.Add('LEFT JOIN SAL_TipoArticulos T WITH (NOLOCK) ');
+    sql.Add(' ON LTRIM(RTRIM(T.sal_descripcion)) = LTRIM(RTRIM(A.CodFamEst)) ');
+    sql.Add('WHERE A.CodArt = ' + quotedstr(cuadrasiesnumerico(vCodArt,15)));
+
+    open;
+
+    if recordcount = 0 then
+    begin
+      MessageDlg('No se ha encontrado el articulo ' + Trim(vCodArt) + '.', mtInformation, [mbOK], 0);
+      Exit;
+    end;
+    vDescripcion := Trim(FieldByName('DescArt').AsString);
+    CodFamEst := Trim(FieldByName('CodFamEst').AsString);
+    CodTipo := Trim(FieldByName('CodTipo').AsString);
+
+    if CodFamEst = '' then
+    begin
+      MessageDlg('El articulo no tiene informada la familia estadistica (CodFamEst).', mtInformation, [mbOK], 0);
+      Exit;
+    end;
+
+    if CodTipo = '' then
+    begin
+      MessageDlg(
+        'No existe un tipo de articulo en SAL_TipoArticulos cuya descripcion coincida con la familia estadistica "' +
+        CodFamEst + '".',
+        mtInformation,
+        [mbOK],
+        0
+      );
+      Exit;
+    end;
+
+    with sqlLotes do
+    begin
+      close;
+      sql.Clear;
+
+      sql.Add('SELECT DISTINCT LTRIM(RTRIM(C.Param3)) AS Lote ');
+      sql.Add('FROM CABEREGU C WITH (NOLOCK) ');
+      sql.Add('WHERE ((ISNULL(C.ge_cerrado, ''F'') = ''F'') or (C.ge_cerrado = '''')) ');
+      sql.Add(' AND NULLIF(LTRIM(RTRIM(C.Param3)), '''') IS NOT NULL ');
+      sql.Add( ' AND LTRIM(RTRIM(C.Param3)) LIKE ' + quotedstr(CodTipo + '%'));
+      sql.Add('ORDER BY Lote');
+
+      open;
+    end;
   end;
 end;
 
@@ -122,6 +209,26 @@ begin
 
   end;
 
+end;
+
+procedure TdmdDatos.ObtenerUnidadesPesoArticulo(vCodArt, VLote: string;
+  var vUnidades: integer; var vKilos: double);
+begin
+  with query do
+  begin
+    close;
+    sql.Clear;
+
+    sql.Add('Select sum(coalesce(ge_unidadespesadas,0)) Unidades, sum(unidades) kilos ');
+    sql.Add(' from lineregu with(nolock)');
+    sql.Add(' where codart = ' + quotedstr(vCodart));
+    sql.Add(' and lote = ' + quotedstr(vLote));
+
+    open;
+
+    vUnidades :=  fieldbyname('unidades').AsInteger;
+    vKilos := fieldbyname('kilos').AsFloat;
+  end;
 end;
 
 procedure TdmdDatos.RecuperarPesadas(vListaIdPesos: TStringList);

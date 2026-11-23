@@ -573,7 +573,7 @@ var
   lNUmLin : double;
   lListPesos : TStringList;
   lPesoTot:double;
-
+  lNumLineas : integer;
 begin
   lListPesos := TStringList.Create;
   lListPesos.Delimiter := ',';
@@ -638,14 +638,15 @@ begin
                  lId :=  FieldByName('ge_id').AsFloat;
                  lPesoTot := 0;
                  lUnidades := 0;
+                 lNumLineas := 0;
                  while not eof do
                  begin
                    if lCodArt <> lCodArtAnt then
                    begin
                       lPesoTot := lPesoTot + lUnidades;
-                      Bd.CrearLineaRegularizacion(lCodArtAnt,lLote,lUnidades ,lListPesos);
+                      Bd.CrearLineaRegularizacion(lCodArtAnt,lLote,lUnidades ,lListPesos, lNumLineas);
                       lUnidades := lPeso;
-
+                      lNumLineas := 1;
                       lListPesos.Free;
                       lListPesos := TStringList.Create;
                       lListPesos.Delimiter := ',';
@@ -655,7 +656,7 @@ begin
                    else
                    begin
                      lUnidades := lUnidades + lPeso;
-
+                     lNumLineas := lNumLineas + 1;
                      lListPesos.Add(FloatToStr(lId));
                    end;
 
@@ -670,7 +671,7 @@ begin
                  end;
                  //Creamos la ultima
                  lPesoTot := lPesoTot + lUnidades;
-                 Bd.CrearLineaRegularizacion(lCodArtAnt,lLote,lUnidades ,lListPesos);
+                 Bd.CrearLineaRegularizacion(lCodArtAnt,lLote,lUnidades ,lListPesos, lNumLineas);
 
 
 

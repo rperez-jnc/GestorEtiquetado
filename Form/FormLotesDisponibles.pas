@@ -64,7 +64,7 @@ type
 
 implementation
 
-constructor TFrmLotesDisponibles.Create(AOwner: TComponent);
+{constructor TFrmLotesDisponibles.Create(AOwner: TComponent);
 begin
   inherited CreateNew(AOwner);
 
@@ -80,6 +80,24 @@ begin
     AplicarEstiloBusquedaTablet(Self, TCustomForm(AOwner))
   else
     AplicarEstiloBusquedaTablet(Self, nil);
+end;}
+constructor TFrmLotesDisponibles.Create(AOwner: TComponent);
+begin
+  inherited CreateNew(AOwner);
+
+  FListaLotes := TStringList.Create;
+
+  Caption := 'Lotes disponibles';
+  Color := clBtnFace;
+  KeyPreview := True;
+
+  CrearControles;
+
+  // Desactivar temporalmente para probar dentro de la DLL
+  // if AOwner is TCustomForm then
+  //   AplicarEstiloBusquedaTablet(Self, TCustomForm(AOwner))
+  // else
+  //   AplicarEstiloBusquedaTablet(Self, nil);
 end;
 
 destructor TFrmLotesDisponibles.Destroy;

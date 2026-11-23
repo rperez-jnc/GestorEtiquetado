@@ -95,7 +95,7 @@ type
     function BuscarEtiquetaCliente(vCodCli, vCodArt:string;Var vEtiqueta:string):boolean;
     procedure ImprimirEtiqueta(vCodArt,vEtiqueta, vCodCLi, vLote:string; vId:double);
     function BuscarFormatoEtiqueta(vCodigo:string):string;
-    procedure CrearLineaRegularizacion(vCodArt,vLote:string;vPeso: double; vListPesos:TStringList);
+    procedure CrearLineaRegularizacion(vCodArt,vLote:string;vPeso: double; vListPesos:TStringList; vNumLineas:integer);
     function BuscarRegularizacion(vLote: string):boolean;
     procedure CrearRegularizacion(vCodArt, vLote, vFao, vArte:string);
     procedure ModificaRegularizacion(vIdReg, vPesoTot: double; vLote:string);
@@ -487,10 +487,12 @@ begin
      result := recordcount > 0;
 
   end;
-
-  Naxregularizacion := coRegularizacion.Create;
-  NaxRegularizacion.Iniciar;
-  NaxRegularizacion.Modifica(lIdReg);
+  if result then
+  begin
+    Naxregularizacion := coRegularizacion.Create;
+    NaxRegularizacion.Iniciar;
+    NaxRegularizacion.Modifica(lIdReg);
+  end;
 end;
 
 procedure TdmdDatos.BuscarTipoArticulo(vCodTipo: string; var vTipo: string);
@@ -514,13 +516,14 @@ begin
   end;
 end;
 
-procedure TdmdDatos.CrearLineaRegularizacion(vCodArt, vLote: string; vPeso: double; vListPesos:TStringList);
+procedure TdmdDatos.CrearLineaRegularizacion(vCodArt, vLote: string; vPeso: double; vListPesos:TStringList; vNumLineas:integer);
 begin
   try
     NaxRegularizacion.NuevaLinea;
     NaxRegularizacion.AsStringLin['CodArt']:= vCodArt;
 
     NaxRegularizacion.AsFloatLin['Unidades']:= vPeso;
+    NaxRegularizacion.AsIntegerLin['Ge_unidadespesadas'] := vNumLineas;
     //NaxRegularizacion.AsStringLin['GE_ListaIdPesos']:= vListPesos.DelimitedText;
 
     if UsaLotes(vCodArt) then

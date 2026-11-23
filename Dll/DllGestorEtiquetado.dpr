@@ -15,7 +15,9 @@ uses
   System.Classes,
   Dll_GestorEtiquetado in 'Dll_GestorEtiquetado.pas',
   DLL_dmEstandar in '..\..\..\comun\dlls\DLL_dmEstandar.pas' {dmDLL: TDataModule},
-  DmDatos in 'Datos\DmDatos.pas' {dmdDatos: TDataModule};
+  DmDatos in 'Datos\DmDatos.pas' {dmdDatos: TDataModule},
+  FormLotes in 'Forms\FormLotes.pas' {FrmLotes},
+  JncFraCxGrid in '..\..\..\comun\frames\JncFraCxGrid.pas' {fraCxGrid: TFrame};
 
 {$R *.res}
 exports
@@ -23,6 +25,8 @@ exports
    FINALIZAR,
    DESPUESDEGUARDARDOCUMENTOV2 ,
    ANTESDEGUARDARLINEACONDETALLEV2,
+   SEPROPORCIONADETALLE,
+   OBTDETALLE,
    REPINTAR;
 
 begin
