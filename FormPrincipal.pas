@@ -644,6 +644,7 @@ begin
                    if lCodArt <> lCodArtAnt then
                    begin
                       lPesoTot := lPesoTot + lUnidades;
+
                       Bd.CrearLineaRegularizacion(lCodArtAnt,lLote,lUnidades ,lListPesos, lNumLineas);
                       lUnidades := lPeso;
                       lNumLineas := 1;
@@ -655,7 +656,9 @@ begin
                    end
                    else
                    begin
+
                      lUnidades := lUnidades + lPeso;
+
                      lNumLineas := lNumLineas + 1;
                      lListPesos.Add(FloatToStr(lId));
                    end;
@@ -671,6 +674,7 @@ begin
                  end;
                  //Creamos la ultima
                  lPesoTot := lPesoTot + lUnidades;
+
                  Bd.CrearLineaRegularizacion(lCodArtAnt,lLote,lUnidades ,lListPesos, lNumLineas);
 
 

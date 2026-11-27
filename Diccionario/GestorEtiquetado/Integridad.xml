@@ -14,6 +14,9 @@
 <PARAMS DEFAULT_ORDER="1 2 3 4"/>
 </METADATA>
 <ROWDATA>
+<ROW TablaPadre="__CLIENTES" TablaHija="GE_ETIQUETASCLIENTE" CamposPadre="CODCLI" CamposHija="GE_CLIENTE" TipoRelacion="R" TipoRelacionU="C"/>
+<ROW TablaPadre="ARTICULO" TablaHija="GE_ETIQUETASCLIENTE" CamposPadre="CODART" CamposHija="GE_ARTICULO" TipoRelacion="R" TipoRelacionU="C"/>
 <ROW TablaPadre="GE_ETIQUETAS" TablaHija="ARTICULO" CamposPadre="GE_CODIGO" CamposHija="GE_ETIQUETA" TipoRelacion="R" TipoRelacionU="C"/>
+<ROW TablaPadre="GE_ETIQUETAS" TablaHija="GE_ETIQUETASCLIENTE" CamposPadre="GE_CODIGO" CamposHija="GE_ETIQUETA" TipoRelacion="R" TipoRelacionU="C"/>
 </ROWDATA>
 </DATAPACKET>

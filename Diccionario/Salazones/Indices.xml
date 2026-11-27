@@ -20,5 +20,7 @@
 <ROW Tabla="SAL_TIPOARTICULOS" Indice="PK_SAL_TIPOARTICULOS" Columnas="SAL_CODTIPO" Clave="TRUE" Unico="FALSE" Agrupado="TRUE"/>
 <ROW Tabla="LINETRAS" Indice="IDX_FKSAL_ARTEPESCLINETRAS00" Columnas="SAL_ARTEPESCA" Clave="FALSE" Unico="FALSE" Agrupado="FALSE"/>
 <ROW Tabla="LINETRAS" Indice="IDX_FKSAL_FAOLINETRAS00" Columnas="SAL_FAO" Clave="FALSE" Unico="FALSE" Agrupado="FALSE"/>
+<ROW Tabla="LINEFACT" Indice="IDX_FKSAL_FAOLINEFACT00" Columnas="SAL_FAO" Clave="FALSE" Unico="FALSE" Agrupado="FALSE"/>
+<ROW Tabla="LINEREGU" Indice="IDX_FKSAL_FAOLINEREGU00" Columnas="SAL_FAO" Clave="FALSE" Unico="FALSE" Agrupado="FALSE"/>
 </ROWDATA>
 </DATAPACKET>

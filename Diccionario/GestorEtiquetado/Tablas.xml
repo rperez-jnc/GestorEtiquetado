@@ -21,12 +21,17 @@
 <PARAMS DEFAULT_ORDER="1"/>
 </METADATA>
 <ROWDATA>
-<ROW Tabla="ARTICULO" Descripcion="Articulos" Virtual="FALSE" Interna="FALSE" Maestro="TRUE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="M" Estado="G" Modificado="20260114T13:11:25000" ModificadoLogico="20260114T13:11:25000" Compartido="1"/>
+<ROW Tabla="__CLIENTES" Descripcion="Clientes(Interna)" Virtual="FALSE" Interna="TRUE" Maestro="TRUE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="M" Estado="I" Modificado="20260428T10:50:02000" ModificadoLogico="20260428T10:50:32000" Compartido="1"/>
+<ROW Tabla="ARTICULO" Descripcion="Articulos" Virtual="FALSE" Interna="FALSE" Maestro="TRUE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="M" Estado="G" Modificado="20260428T10:47:08000" ModificadoLogico="20260428T10:49:02000" Compartido="1"/>
+<ROW Tabla="CABEREGU" Descripcion="Cabeceras de regularizacion" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="G" Estado="G" Modificado="20260929T14:53:40000" ModificadoLogico="20260929T14:53:49000" Compartido="1"/>
 <ROW Tabla="GE_BASCULAS" Descripcion="Basculas" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="TRUE" Externo="TRUE" Jerarquia="FALSE" Tipo="A" Estado="G" Modificado="20260113T08:46:13000" ModificadoLogico="20260113T08:46:13000" Compartido="1"/>
-<ROW Tabla="GE_ETIQUETAS" Descripcion="Etiquetas a usar en Gestor de Etiquetado " Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="TRUE" Externo="TRUE" Jerarquia="FALSE" Tipo="A" Estado="G" Modificado="20260407T10:29:00000" ModificadoLogico="20260407T10:29:07000" Compartido="1"/>
+<ROW Tabla="GE_ETIQUETAS" Descripcion="Etiquetas de A3erp a usar en Gestor de Etiquetado " Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="TRUE" Externo="TRUE" Jerarquia="FALSE" Tipo="A" Estado="G" Modificado="20260429T14:37:52000" ModificadoLogico="20260429T18:06:06000" Compartido="1"/>
+<ROW Tabla="GE_ETIQUETASCLIENTE" Descripcion="Etiquetas cliente articulo" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="TRUE" Externo="TRUE" Jerarquia="FALSE" Tipo="A" Estado="G" Modificado="20260429T08:46:14000" ModificadoLogico="20260429T08:46:14000" Compartido="1"/>
 <ROW Tabla="GE_LOG" Descripcion="Log de gestor de etiquetas" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="TRUE" Externo="TRUE" Jerarquia="FALSE" Tipo="A" Estado="G" Modificado="20260113T12:35:19000" ModificadoLogico="20260114T10:19:52000" Compartido="1"/>
-<ROW Tabla="GE_PESADAS" Descripcion="Pesadas" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="TRUE" Externo="TRUE" Jerarquia="FALSE" Tipo="A" Estado="G" Modificado="20260408T09:56:23000" ModificadoLogico="20260408T09:56:23000" Compartido="1"/>
-<ROW Tabla="LINEREGU" Descripcion="L&#237;neas de regularizacion" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="G" Estado="G" Modificado="20260409T08:34:00000" ModificadoLogico="20260409T08:34:09000" Compartido="1"/>
+<ROW Tabla="GE_PESADAS" Descripcion="Pesadas" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="TRUE" Externo="TRUE" Jerarquia="FALSE" Tipo="A" Estado="G" Modificado="20261118T20:12:59000" ModificadoLogico="20261118T20:12:59000" Compartido="1"/>
+<ROW Tabla="LINEALBA" Descripcion="Lineas de albaranes" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="G" Estado="G" Modificado="20261119T13:32:23000" ModificadoLogico="20261119T13:32:23000" Compartido="1"/>
+<ROW Tabla="LINEFACT" Descripcion="Lineas de facturas" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="G" Estado="G" Modificado="20261127T10:26:00000" ModificadoLogico="20261127T10:26:08000" Compartido="1"/>
+<ROW Tabla="LINEREGU" Descripcion="Lineas de regularizacion" Virtual="FALSE" Interna="FALSE" Maestro="FALSE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="G" Estado="G" Modificado="20261119T13:31:42000" ModificadoLogico="20261119T13:31:42000" Compartido="1"/>
 <ROW Tabla="PERSONA" Descripcion="Personas" Virtual="FALSE" Interna="FALSE" Maestro="TRUE" Auxiliar="FALSE" Externo="TRUE" Jerarquia="FALSE" Tipo="M" Estado="G" Modificado="20260113T11:48:34000" ModificadoLogico="20260113T11:48:39000" Compartido="1"/>
 </ROWDATA>
 </DATAPACKET>

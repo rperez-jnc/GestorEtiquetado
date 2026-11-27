@@ -13,8 +13,8 @@
 </METADATA>
 <ROWDATA>
 <ROW Tabla="GE_BASCULAS" Indice="PK_GE_BASCULAS" Columnas="GE_CODIGO" Clave="TRUE" Unico="FALSE" Agrupado="TRUE"/>
-<ROW Tabla="GE_ETIQUETAS" Indice="IDX_CODIGO_ETIQUETAS" Columnas="GE_CODIGO" Clave="FALSE" Unico="TRUE" Agrupado="FALSE"/>
-<ROW Tabla="GE_ETIQUETAS" Indice="PK_GE_ETIQUETAS" Columnas="GE_ID" Clave="TRUE" Unico="FALSE" Agrupado="TRUE"/>
+<ROW Tabla="GE_ETIQUETAS" Indice="PK_GE_ETIQUETAS" Columnas="GE_CODIGO" Clave="TRUE" Unico="FALSE" Agrupado="TRUE"/>
+<ROW Tabla="GE_ETIQUETASCLIENTE" Indice="IDX_FKGE_ETIQUETASGE_ETIQUETAS00" Columnas="GE_ETIQUETA" Clave="FALSE" Unico="FALSE" Agrupado="FALSE"/>
 <ROW Tabla="GE_LOG" Indice="PK_GE_LOG" Columnas="GE_ID" Clave="TRUE" Unico="FALSE" Agrupado="TRUE"/>
 <ROW Tabla="GE_PESADAS" Indice="PK_GE_PESADAS" Columnas="GE_ID" Clave="TRUE" Unico="FALSE" Agrupado="TRUE"/>
 </ROWDATA>

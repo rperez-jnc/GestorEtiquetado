@@ -22,5 +22,6 @@
 <ROW TablaPadre="SAL_ARTEPESCA" TablaHija="LINEFACT" CamposPadre="SAL_ARTEPESCA" CamposHija="SAL_ARTEPESCA" TipoRelacion="R" TipoRelacionU="C"/>
 <ROW TablaPadre="SAL_ARTEPESCA" TablaHija="LINETRAS" CamposPadre="SAL_ARTEPESCA" CamposHija="SAL_ARTEPESCA" TipoRelacion="R" TipoRelacionU="C"/>
 <ROW TablaPadre="SAL_FAO" TablaHija="LINETRAS" CamposPadre="FAO" CamposHija="SAL_FAO" TipoRelacion="R" TipoRelacionU="C"/>
+<ROW TablaPadre="FAMILIAS" TablaHija="SAL_TIPOARTICULOS" CamposPadre="CODFAM" CamposHija="SAL_DESCRIPCION" TipoRelacion="R" TipoRelacionU="C" FiltroPadre="FICHERO = &apos;Estadis&apos;"/>
 </ROWDATA>
 </DATAPACKET>

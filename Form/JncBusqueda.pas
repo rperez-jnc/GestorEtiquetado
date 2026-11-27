@@ -541,7 +541,10 @@ begin
    end;
  // Bd.Conecta;
   TipoMaestro := vTipoMaestro;
+
   Teclado := vTeclado;
+ 
+
 end;
 
 procedure TfrmSeleccion.buscaSinDatos(vCondicion, vAdicionales, vRelacionados,

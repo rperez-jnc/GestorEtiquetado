@@ -100,11 +100,12 @@ BEGIN
    END;
    if (((documento = 'RE') or (documento = 'TR') or (documento = 'AV') or (documento = 'FV')) and (Estado < 2)) then
    BEGIN
-      lUnidadesLinea := TInternoDll.GetValorCampoVarFloat(Linea,'ge_unidadesventa');
 
       //Vemos si tenemos que calcular la doble unidad
       if ((documento = 'AV')  and (Estado < 2)) then
        BEGIN
+           lUnidadesLinea := TInternoDll.GetValorCampoVarFloat(Linea,'ge_unidadesventa');
+
            lCodArt := TInternoDLL.GetValorCampoVarStr(Linea, 'CodArt');
            lLote := TInternoDLL.GetValorCampoDetalleStr(Detalle, 'Lote');
 
@@ -126,7 +127,11 @@ BEGIN
 
        END
        else
+       begin
+          lUnidadesLinea := TInternoDll.GetValorCampoVarFloat(Linea,'unidades');
+
           lUnidadesCalculadas :=  lUnidadesLinea;
+       end;
 
        result := varArrayCreate([0, 3], varVariant);
          result[0] := 3;

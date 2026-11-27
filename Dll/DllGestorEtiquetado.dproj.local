@@ -3,21 +3,21 @@
 	<Transactions>
     <Transaction>2024/06/05 11:14:54.000.461,=C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2024/12/18 12:38:53.000.550,=C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2026/04/01 11:59:09.000.799,C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Project1.dproj=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\DllGestorEtiquetado.dproj</Transaction>
+    <Transaction>2026/04/01 11:59:09.000.799,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\DllGestorEtiquetado.dproj=C:\Users\usuario\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
     <Transaction>2026/04/01 11:59:45.000.887,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas</Transaction>
-    <Transaction>2026/04/01 11:59:58.000.472,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Dll_GestorEtiquetado.pas</Transaction>
+    <Transaction>2026/04/01 11:59:58.000.472,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Dll_GestorEtiquetado.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas</Transaction>
     <Transaction>2026/04/01 12:05:38.000.922,=E:\Repositorios\comun\dlls\DLL_dmEstandar.pas</Transaction>
     <Transaction>2026/04/01 12:06:01.000.442,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas</Transaction>
-    <Transaction>2026/04/01 12:06:58.000.995,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Datos\DmDatos.pas</Transaction>
-    <Transaction>2026/04/01 12:06:58.000.995,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Datos\DmDatos.dfm</Transaction>
-    <Transaction>2026/11/20 14:38:58.635,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas</Transaction>
-    <Transaction>2026/11/20 14:49:19.589,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormLotesDisponibles.pas</Transaction>
-    <Transaction>2026/11/20 14:53:59.643,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\uEstiloBusquedaTablet.pas</Transaction>
-    <Transaction>2026/11/23 08:31:27.652,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas</Transaction>
-    <Transaction>2026/11/23 08:32:59.793,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Forms\FormLotes.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas</Transaction>
-    <Transaction>2026/11/23 08:32:59.793,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Forms\FormLotes.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.dfm</Transaction>
-    <Transaction>2026/11/23 08:42:31.583,=E:\Repositorios\comun\frames\JncFraCxGrid.pas</Transaction>
-    <Transaction>2026/11/23 09:29:23.182,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\uEstiloBusquedaTablet.pas=</Transaction>
-    <Transaction>2026/11/23 09:29:27.959,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormLotesDisponibles.pas=</Transaction>
+    <Transaction>2026/04/01 12:06:58.000.995,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Datos\DmDatos.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.dfm</Transaction>
+    <Transaction>2026/04/01 12:06:58.000.995,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Datos\DmDatos.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas</Transaction>
+    <Transaction>2026/11/20 14:38:58.000.635,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas</Transaction>
+    <Transaction>2026/11/20 14:49:19.000.589,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormLotesDisponibles.pas</Transaction>
+    <Transaction>2026/11/20 14:53:59.000.643,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\uEstiloBusquedaTablet.pas</Transaction>
+    <Transaction>2026/11/23 08:31:27.000.652,=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas</Transaction>
+    <Transaction>2026/11/23 08:32:59.000.793,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.pas=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Forms\FormLotes.pas</Transaction>
+    <Transaction>2026/11/23 08:32:59.000.793,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Unit1.dfm=E:\Repositorios\SalazonesSaez\GestorEtiquetado\Dll\Forms\FormLotes.dfm</Transaction>
+    <Transaction>2026/11/23 08:42:31.000.583,=E:\Repositorios\comun\frames\JncFraCxGrid.pas</Transaction>
+    <Transaction>2026/11/23 09:29:23.000.182,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\uEstiloBusquedaTablet.pas=</Transaction>
+    <Transaction>2026/11/23 09:29:27.000.959,E:\Repositorios\SalazonesSaez\GestorEtiquetado\Form\FormLotesDisponibles.pas=</Transaction>
   </Transactions>
 </BorlandProject>
